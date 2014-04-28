@@ -6,11 +6,11 @@ char timemillis[12];
 long time1;
 
 void setup() {
-
+	delay(4000);
 	Serial.begin(HARDWARE_SERIAL_BAUD_RATE);
 	Serial.println("Test Setup");
 	SD.Initialize();
-
+	delay(2000);
 	Serial.println(COORDINATE_MSG);
 	SD.Write("Hi THIS IS A NIGHT TEST");
 	

@@ -11,7 +11,7 @@
 
 #include <Adafruit_GPS.h>
 #if ARDUINO >= 100
- #include <SoftwareSerial.h>
+ //#include <SoftwareSerial.h>
 #else
   // Older Arduino IDE requires NewSoftSerial, download from:
   // http://arduiniana.org/libraries/newsoftserial/
@@ -31,7 +31,7 @@
 // If using software serial, keep these lines enabled
 // (you can change the pin numbers to match your wiring):
 #if ARDUINO >= 100
-  SoftwareSerial mySerial(3, 2);
+ // SoftwareSerial mySerial(3, 2);
 #else
   NewSoftSerial mySerial(3, 2);
 #endif
@@ -83,7 +83,7 @@ void setup()
   // the nice thing about this code is you can have a timer0 interrupt go off
   // every 1 millisecond, and read data from the GPS for you. that makes the
   // loop code a heck of a lot easier!
-  useInterrupt(true);
+ // useInterrupt(true);
   
   delay(1000);
 }
@@ -115,5 +115,9 @@ void useInterrupt(boolean v) {
 
 void loop()                     // run over and over again
 {
+	if(Serial1.available())
+	{
+	Serial.println(GPS.read());
+	}
    // do nothing! all reading and printing is done in the interrupt
 }

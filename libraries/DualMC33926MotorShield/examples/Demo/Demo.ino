@@ -24,12 +24,16 @@ void setup()
   Serial.println("Dual MC33926 Motor Shield");
   md.init();
   md.setM1Speed(400);
-  md.setM2Speed(400);
+  //md.setM2Speed(400);
   delay(3000);
 }
 
 void loop()
 {
+	\
+
+
+		/*
 	TH = pulseIn(_dTH, HIGH, 25000); // Read the pulse width of
 	md.setM2Speed(TH-1500);
 	//md.setM1Speed(400);
@@ -42,6 +46,7 @@ void loop()
     Serial.println(md.getM2CurrentMilliamps());
     stopIfFault();
 	delay(200);
+	*/
 	
 	/*
   for (int i = 0; i <= 400; i++)

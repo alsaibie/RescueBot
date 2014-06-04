@@ -27,30 +27,28 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #define STAGE3_SAMPLING 100000 //.1sec
 //GPS 
 #define GPS_ENABLE_PIN 2
-#define USING_GPS_SOFTWARESERIAL 0
+#define GPS_UART	1
 //MOTOR 
-#define MOTOR1_ENABLE_PIN 6
-#define MOTOR1_LOGIC1_PIN 2
-#define MOTOR1_LOGIC2_PIN 3
 #define FORWARD 1
 #define BACKWARD 0
-//SERVO
-#define SERVO_CONTROL_PIN 5
-/*
-//PRESSURE SENSOR
-#define PSENSOR_ENABLE_PIN 7
-#define ACTUALSEAPRESSURE 101500
-#define PRESSURERUNNINGAVGSIZE 10
-#define LIFTOFFTHRESHOLD 25.0f
-//ACCELEROMETER
-#define ACC_RUNNINGAVGSIZE 5
-#define ACC_X_ANALOGPIN 1
-#define ACC_Y_ANALOGPIN 2
-#define ACC_Z_ANALOGPIN 3
-#define VOLTAGEREFERENCE 5
-*/
+#define M1DIR_PIN 23
+#define M2DIR_PIN 21
+#define MOTOR1_FB_PIN A0
+#define MOTOR2_FB_PIN A1
+#define MOTOR_SF_PIN 13
+#define MOTOR_ENABLE_PIN 16
+#define MOTOR_D_PIN 17
+#define MOTOR1_PWM_PIN 22
+#define MOTOR2_PWM_PIN 20
+
 //SD CARD
 #define OPENLOG_GRN_PIN 11 //Reset Pin
+
+//RECEIVER
+#define THRO_RX_PIN 3
+#define AILE_RX_PIN 4
+#define ELEV_RX_PIN 5
+#define RUDD_RX_PIN 6
 
 
 

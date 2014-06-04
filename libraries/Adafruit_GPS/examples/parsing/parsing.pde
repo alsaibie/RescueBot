@@ -12,7 +12,7 @@
 // and help support open source hardware & software! -ada
 
 #include <Adafruit_GPS.h>
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #define GPSEnable 2
 // If you're using a GPS module:
 // Connect the GPS Power pin to 5V
@@ -156,6 +156,7 @@ void loop()                     // run over and over again
     Serial.println(GPS.year, DEC);
     Serial.print("Fix: "); Serial.print((int)GPS.fix);
     Serial.print(" quality: "); Serial.println((int)GPS.fixquality); 
+	Serial.println(GPS.read());
     if (GPS.fix) {
       Serial.print("Location: ");
       Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);

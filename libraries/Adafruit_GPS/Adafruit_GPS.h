@@ -21,7 +21,7 @@ All text above must be included in any redistribution
 #define _ADAFRUIT_GPS_H
 
 #if ARDUINO >= 100
- #include <SoftwareSerial.h>
+// #include <SoftwareSerial.h>
 #else
  #include <NewSoftSerial.h>
 #endif
@@ -72,7 +72,7 @@ All text above must be included in any redistribution
 #if ARDUINO >= 100
  #include "Arduino.h"
 #if !defined(__AVR_ATmega32U4__)
- #include "SoftwareSerial.h"
+// #include "SoftwareSerial.h"
 #endif
 #else
  #include "WProgram.h"
@@ -85,7 +85,7 @@ class Adafruit_GPS {
   void begin(uint16_t baud); 
 
 #if ARDUINO >= 100 
-  Adafruit_GPS(SoftwareSerial *ser); // Constructor when using SoftwareSerial
+//  Adafruit_GPS(SoftwareSerial *ser); // Constructor when using SoftwareSerial
 #else
   Adafruit_GPS(NewSoftSerial  *ser); // Constructor when using NewSoftSerial
 #endif
@@ -126,7 +126,7 @@ class Adafruit_GPS {
   
   uint8_t parseResponse(char *response);
 #if ARDUINO >= 100
-  SoftwareSerial *gpsSwSerial;
+ // SoftwareSerial *gpsSwSerial;
 #else
   NewSoftSerial  *gpsSwSerial;
 #endif

@@ -12,7 +12,7 @@
 //This code is intended for use with Arduino Leonardo and other ATmega32U4-based Arduinos
 
 #include <Adafruit_GPS.h>
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 
 // Connect the GPS Power pin to 5V
 // Connect the GPS Ground pin to ground
@@ -25,11 +25,11 @@
 
 // If using software serial, keep these lines enabled
 // (you can change the pin numbers to match your wiring):
-SoftwareSerial mySerial(8, 7);
+//SoftwareSerial mySerial(8, 7);
 
 // If using hardware serial, comment
 // out the above two lines and enable these two lines instead:
-//HardwareSerial mySerial = Serial1;
+HardwareSerial mySerial = Serial1;
 
 #define PMTK_SET_NMEA_UPDATE_1HZ  "$PMTK220,1000*1F"
 #define PMTK_SET_NMEA_UPDATE_5HZ  "$PMTK220,200*2C"

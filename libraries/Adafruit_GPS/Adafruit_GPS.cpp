@@ -164,14 +164,14 @@ char Adafruit_GPS::read(void) {
   
   if (paused) return c;
 
-  if(gpsSwSerial) {
+/*  if(gpsSwSerial) {
     if(!gpsSwSerial->available()) return c;
     c = gpsSwSerial->read();
   } else {
     if(!gpsHwSerial->available()) return c;
     c = gpsHwSerial->read();
   }
-
+  */
   //Serial.print(c);
 
   if (c == '$') {
@@ -202,10 +202,10 @@ char Adafruit_GPS::read(void) {
 
   return c;
 }
-
+/*
 // Constructor when using SoftwareSerial or NewSoftSerial
 #if ARDUINO >= 100
-Adafruit_GPS::Adafruit_GPS(SoftwareSerial *ser)
+//Adafruit_GPS::Adafruit_GPS(SoftwareSerial *ser)
 #else
 Adafruit_GPS::Adafruit_GPS(NewSoftSerial *ser) 
 #endif
@@ -213,7 +213,7 @@ Adafruit_GPS::Adafruit_GPS(NewSoftSerial *ser)
   common_init();     // Set everything to common state, then...
   gpsSwSerial = ser; // ...override gpsSwSerial with value passed.
 }
-
+*/
 // Constructor when using HardwareSerial
 Adafruit_GPS::Adafruit_GPS(HardwareSerial *ser) {
   common_init();  // Set everything to common state, then...
@@ -222,7 +222,7 @@ Adafruit_GPS::Adafruit_GPS(HardwareSerial *ser) {
 
 // Initialization code used by all constructor types
 void Adafruit_GPS::common_init(void) {
-  gpsSwSerial = NULL; // Set both to NULL, then override correct
+//  gpsSwSerial = NULL; // Set both to NULL, then override correct
   gpsHwSerial = NULL; // port pointer in corresponding constructor
   recvdflag   = false;
   paused      = false;
@@ -241,15 +241,15 @@ void Adafruit_GPS::common_init(void) {
 
 void Adafruit_GPS::begin(uint16_t baud)
 {
-  if(gpsSwSerial) gpsSwSerial->begin(baud);
-  else            gpsHwSerial->begin(baud);
+//  if(gpsSwSerial) gpsSwSerial->begin(baud);
+  gpsHwSerial->begin(baud);
 
   delay(10);
 }
 
 void Adafruit_GPS::sendCommand(char *str) {
-  if(gpsSwSerial) gpsSwSerial->println(str);
-  else            gpsHwSerial->println(str);
+//  if(gpsSwSerial) gpsSwSerial->println(str);
+             gpsHwSerial->println(str);
 }
 
 boolean Adafruit_GPS::newNMEAreceived(void) {

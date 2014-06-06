@@ -1,0 +1,12 @@
+#include "RR_ESC.h"
+
+// Constructors ////////////////////////////////////////////////////////////////
+
+RR_ESC::RR_ESC(void)
+{
+
+}
+
+RR_ESC::~RR_ESC(void)
+{
+}

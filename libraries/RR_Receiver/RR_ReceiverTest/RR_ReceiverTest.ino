@@ -1,4 +1,5 @@
 
+#include <RR_Receiver.h>
 #include <RR_CommonDefines.h>
 
 #define _dTHR THRO_RX_PIN
@@ -7,14 +8,14 @@
 #define _dRUD RUDD_RX_PIN
 
 int THR, AIL, ELE, RUD;
-#define CHANNELNO 3
-
+RR_Receiver Spektrum;
 void setup()
 {
+	/*
   pinMode(_dTHR, INPUT); // Set our input pins as such
   pinMode(_dAIL, INPUT);
   pinMode(_dELE, INPUT);
-  pinMode(_dRUD, INPUT);
+  pinMode(_dRUD, INPUT);*/
   Serial.begin(115200);
   Serial.println("Receiver Test");
   delay(3000);
@@ -24,6 +25,8 @@ void setup()
 
 void loop()
 { 
+	Serial.println(Spektrum.getSignal(AILE));
+	/*
   THR = pulseIn(_dTHR, HIGH, 25000); // Read the pulse width of
   Serial.println(THR);
   AIL = pulseIn(_dAIL, HIGH, 25000); // Read the pulse width of
@@ -32,6 +35,6 @@ void loop()
   Serial.println(ELE);
   RUD = pulseIn(_dRUD, HIGH, 25000); // Read the pulse width of
   //Serial.println(RUD);
-  /* add main program code here */
-
+  
+	*/
 }

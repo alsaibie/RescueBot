@@ -8,6 +8,7 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #include <string.h>
 #include <ctype.h>
 
+#define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
 //WINNING NUMBERS - MODIFY ACCORDINGLY
 #define TARGET_LAT 3347.342f  //N  ddmm.mmmm

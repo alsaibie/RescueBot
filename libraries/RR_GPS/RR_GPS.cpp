@@ -1,0 +1,12 @@
+#include "RR_GPS.h"
+
+// Constructors ////////////////////////////////////////////////////////////////
+
+RR_GPS::RR_GPS(void)
+{
+
+}
+
+RR_GPS::~RR_GPS(void)
+{
+}

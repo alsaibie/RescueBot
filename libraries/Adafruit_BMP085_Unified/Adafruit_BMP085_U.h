@@ -23,13 +23,13 @@
  #include "WProgram.h"
 #endif
 
-#include <Adafruit_Sensor.h>
+#include <Adafruit_Sensor\Adafruit_Sensor.h>
 
 #ifdef __AVR_ATtiny85__
  #include "TinyWireM.h"
  #define Wire TinyWireM
 #else
- #include <Wire.h>
+ #include <Wire\Wire.h>
 #endif
 
 /*=========================================================================

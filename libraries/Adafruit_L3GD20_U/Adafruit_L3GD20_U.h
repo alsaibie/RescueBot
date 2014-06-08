@@ -23,8 +23,8 @@
  #include "WProgram.h"
 #endif
 
-#include <Adafruit_Sensor.h>
-#include <Wire.h>
+#include <Adafruit_Sensor\Adafruit_Sensor.h>
+#include <Wire\Wire.h>
 
 /*=========================================================================
     I2C ADDRESS/BITS AND SETTINGS

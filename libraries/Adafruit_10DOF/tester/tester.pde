@@ -92,9 +92,10 @@ void setup(void)
     Serial.print("Ooops, no L3GD20 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
-  
+  delay(3000);
   /* Display some basic information on this sensor */
   displaySensorDetails();
+  delay(5000);
 }
 
 void loop(void)

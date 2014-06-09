@@ -23,5 +23,5 @@ void setup(void)
 void loop(void)
 {
   imu.updateIMU();
-  delay(1000);
+  delay(200);
 }

@@ -5,12 +5,13 @@ class RR_Driver
 {
 public:
 	RR_Driver(void);
-	RR_Driver(RR_Receiver *rec);
-	//RR_Driver(Pointers to IMU, Encoder, GPS, Motor)
-	//RR_Driver(Pointer to Receiver object) or combine
 	void driveManual(void);
-	void driveAuto(void);
-	RR_Receiver *_receiver;
+	//void driveAuto(message passed vector with gps location, heading, bearing);
+	RR_Receiver receiver;
+	RR_Motor motors;
+	void Enable(void);
 	~RR_Driver(void);
+private:
+	int leftSpeed, rightSpeed;
 };
 

@@ -31,6 +31,18 @@ void RR_IMU::updateIMU(void)
     mag.getEvent(&mag_event);
 	gyro.getEvent(&gyro_event);
 	dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
+	if(DBUG)
+	{
+		/* 'orientation' should have valid .roll and .pitch fields */
+		Serial.print(F("Orientation: "));
+		Serial.print(orientation.roll);
+		Serial.print(F(" "));
+		Serial.print(orientation.pitch);
+		Serial.print(F(" "));
+		Serial.print(orientation.heading);
+		Serial.println(F(""));
+	}
+
 }
 void RR_IMU::DisplayIMUDetails(void)
 {

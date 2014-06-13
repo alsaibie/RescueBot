@@ -163,15 +163,15 @@ char Adafruit_GPS::read(void) {
   char c = 0;
   
   if (paused) return c;
-
-/*  if(gpsSwSerial) {
+/*
+  if(gpsSwSerial) {
     if(!gpsSwSerial->available()) return c;
     c = gpsSwSerial->read();
-  } else {
+  } else { */
     if(!gpsHwSerial->available()) return c;
     c = gpsHwSerial->read();
-  }
-  */
+ // }
+  
   //Serial.print(c);
 
   if (c == '$') {

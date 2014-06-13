@@ -17,7 +17,8 @@ void loop()
 {
 	if(Serial1.available())
 	{
-	Serial.print(Serial1.read());
+		char c=Serial1.read();
+		Serial.print(c);
 	}
   /* add main program code here */
 

@@ -1,4 +1,3 @@
-
 #include <RR_Receiver.h>
 #include <RR_CommonDefines.h>
 

@@ -117,7 +117,7 @@ void loop()                     // run over and over again
 {
 	if(Serial1.available())
 	{
-	Serial.println(GPS.read());
+	Serial.print(GPS.read());
 	}
    // do nothing! all reading and printing is done in the interrupt
 }

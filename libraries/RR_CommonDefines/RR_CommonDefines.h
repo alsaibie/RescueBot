@@ -11,6 +11,8 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
 #define DBUG true
+#define MOTOR_GEAR_RATIO 72
+#define ENCODER_COUNT 48
 //WINNING NUMBERS - MODIFY ACCORDINGLY
 #define TARGET_LAT 3347.342f  //N  ddmm.mmmm
 #define TARGET_LON - 8424.003f //W dddmm.mmmm

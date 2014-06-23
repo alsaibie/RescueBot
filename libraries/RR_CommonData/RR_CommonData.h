@@ -33,6 +33,7 @@ struct RR_GPSData_t
 	float	LatitudeRadian, LongitudeRadian;
 	float	LatitudeRadianTarget, LongitudeRadianTarget;
 	float	Bearing;
+	int		DistanceToTarget;
 	int		Speed;
 	
 	struct Date_t

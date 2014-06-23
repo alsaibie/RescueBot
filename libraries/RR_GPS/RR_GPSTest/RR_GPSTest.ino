@@ -42,7 +42,20 @@ static void vGPSTask(void *pvParameters)
 	gps.Update();
 	if(gps.newGPSData)
 	{
-		Serial.println(gpsData.Time.Seconds);
+		if(gps.fix)
+		{
+		//Take Semaphore
+		//Update
+			gps.getData();
+			Serial.println(gpsData.Time.Seconds);
+		//Release Semaphore
+		}
+		else
+		{
+			if(DBUG)
+				Serial.println("NoFix");
+		}
+
 	}
 	vTaskDelay((1L *configTICK_RATE_HZ)/1000L);
 	}

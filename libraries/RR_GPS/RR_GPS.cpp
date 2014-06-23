@@ -5,6 +5,8 @@
 RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 {
 	gpsData=data;
+	gpsData->LatitudeRadianTarget(TARGET_LAT, "N");
+	gpsData->LongitudeRadianTarget(TARGET_LON, "W");
 
 	//Default to low on pin at constructor
 	pinMode(GPS_ENABLE_PIN, OUTPUT);
@@ -13,7 +15,6 @@ RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 
 void RR_GPS::Enable(void)
 {
-
   digitalWrite(GPS_ENABLE_PIN,HIGH);
 
   // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
@@ -28,6 +29,7 @@ void RR_GPS::Enable(void)
   // Request updates on antenna status, comment out to keep quiet
   sendCommand(PGCMD_ANTENNA);
 }
+
 
 void RR_GPS::Update(void)
 {
@@ -47,20 +49,24 @@ void RR_GPS::Update(void)
 		}
 
 		if (!parse(lastNMEA()))   // this also sets the newNMEAreceived() flag to false
-		{return;}  // we can fail to parse a sentence in which case we should just wait for another
-
-		if(fix)
-		{
-			getPosition();
-			getTimeDate();
-			newGPSData=true;
-		}
-		else
 		{
 			newGPSData=false;
+			return;
+		}  // we can fail to parse a sentence in which case we should just wait for another
+		else
+		{
+					newGPSData=true;
 		}
 	}
 }
+
+void RR_GPS::getData(void)
+{
+		getPosition();
+		getBearing();
+		getTimeDate();
+}
+
 
 void RR_GPS::getPosition(void)
 {
@@ -68,8 +74,9 @@ void RR_GPS::getPosition(void)
 	gpsData->Longitude=longitude;
 	gpsData->Lat=lat;
 	gpsData->Lon=lon;
-
 	//Convert to Radians and store accordingly.
+	gpsData->LatitudeRadian=toRadians(latitude,lat);
+	gpsData->LongitudeRadian=toRadians(longitude,lon);
 
 }
 
@@ -101,17 +108,19 @@ void RR_GPS::getBearing(void)
 
 	float a = sin(dlat/2)*sin(dlat/2)+sin(dlong/2)*sin(dlong/2)*cos(lat1)*cos(lat2);
 	float c = 2*atan2(sqrt(a),sqrt(1-a));
-	distance_rem = R*c;
+	
+	gpsData->DistanceToTarget = R*c;
 
 	// Using the formula for bearing to calculate the required current heading.
 	float y = sin(dlong)*cos(lat2);
 	float x = cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(dlong);
+	
 	gpsData->Bearing = fmod((atan2(y,x)*57.295779513+360),360); // Multiplied by constant to convert to decimal degrees.
   
 }
 
 
-float RR_GPS::toRadians(float coordinate)
+float RR_GPS::toRadians(float coordinate, char cor)
 {
   float min = fmod(coordinate, 100.0)/60.0;
   float deg = float(int(coordinate/100));

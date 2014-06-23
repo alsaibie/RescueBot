@@ -38,7 +38,7 @@ typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
 #define GPS_Serial Serial1
 
 //MACRO FUNCTIONS
-#define TORAD(x) 
+
 //MOTOR 
 #define FORWARD 1
 #define BACKWARD 0

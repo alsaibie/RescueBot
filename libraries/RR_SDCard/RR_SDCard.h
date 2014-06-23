@@ -7,6 +7,7 @@
 #endif
 
 #include <../RR_CommonDefines/RR_CommonDefines.h>
+#include <RR_CommonData\RR_CommonData.h>
 //define message types here
 #define COORDINATE_MSG "$COORDINATE,"
 #define SPEED_MSG "$SPEED,"

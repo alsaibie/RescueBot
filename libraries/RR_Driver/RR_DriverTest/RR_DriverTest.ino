@@ -1,3 +1,6 @@
+#include <Encoder.h>
+#include <RR_Encoder.h>
+#include <RR_CommonData.h>
 #include <RR_Receiver.h>
 #include <RR_Motor.h>
 #include <RR_Driver.h>

@@ -1,9 +1,10 @@
 // Constructors ////////////////////////////////////////////////////////////////
 #include "RR_IMU.h"
-RR_IMU::RR_IMU(void):accel(30301), mag(30302), gyro(20), dof()
+RR_IMU::RR_IMU(RR_IMUData_t *data):accel(30301), mag(30302), gyro(20), dof()
 {
-
+	imuData=data;
 }
+
 void RR_IMU::initIMU(void)
 {
   if(!accel.begin())
@@ -28,9 +29,25 @@ void RR_IMU::initIMU(void)
 void RR_IMU::updateIMU(void)
 {
 	accel.getEvent(&accel_event);
+	imuData->accelerometer.x=accel_event.acceleration.x;
+	imuData->accelerometer.y=accel_event.acceleration.y;
+	imuData->accelerometer.z=accel_event.acceleration.z;
+
     mag.getEvent(&mag_event);
+	imuData->magnetometer.x=mag_event.magnetic.x;
+	imuData->magnetometer.y=mag_event.magnetic.y;
+	imuData->magnetometer.z=mag_event.magnetic.z;
+
 	gyro.getEvent(&gyro_event);
+	imuData->gyro.x=gyro_event.gyro.x;
+	imuData->gyro.y=gyro_event.gyro.y;
+	imuData->gyro.z=gyro_event.gyro.z;
+
 	dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
+	imuData->fused.roll=orientation.roll;
+	imuData->fused.pitch=orientation.pitch;
+	imuData->fused.heading=orientation.heading;
+
 	if(DBUG)
 	{
 		/* 'orientation' should have valid .roll and .pitch fields */

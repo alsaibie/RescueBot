@@ -1,4 +1,4 @@
-
+#include <Encoder.h>
 #include <RR_IMU.h>
 #include <RR_Telemetry.h>
 #include <RR_Altimeter.h>
@@ -25,13 +25,18 @@
 
 //Task Handles
 xTaskHandle _htaskGPS, _htaskIMU, _htaskAltiemter,  _htaskDriver, _htaskTelemetry, _htaskLogger, _htaskState;
-//Queue Handles
-xQueueHandle _queuehandle1;
-//Queues to create: Need to think about the message passing structure first.
-//Semaphore Handles
-xSemaphoreHandle _semaphorehandle1;
 
-//List of Tasks - Definitions
+//Shared Data Structs
+RR_IMUData_t		IMUData;
+RR_AltimeterData_t	AltimeterData;
+RR_LoggerData_t		LoggerData;
+RR_GPSData_t		GPSData;
+RR_TelemetryData_t	TelemetryData;
+
+//Semaphore Handles
+xSemaphoreHandle _GPSMutex, _IMUMutex, TelemetryMutex, LoggerMutex, AltimeterMutex;
+
+//List of Tasks - Declaration / Definitions Below
 static void vGPSTask(void *pvParameters);
 static void vIMUTask(void *pvParameters);
 static void vAltimeterTask(void *pvParameters);
@@ -41,44 +46,48 @@ static void vLoggerTask(void *pvParameters);
 static void vStateTask (void *pvParameters);
 
 //List of Objects
-RR_Altimeter	altimeter;
+RR_Altimeter	altimeter(&AltimeterData);
 RR_Driver		driver;
-RR_GPS			gps;
+RR_GPS			gps(&GPSData);
 RR_MOSFET		nichrome;
-RR_Encoder		encoder;
+//RR_Encoder		encoder; //only needed inside Driver class
 //RR_SDCard		sdcard; //Class needs fixing
-//RR_Telemetry	radio;  //Class needs making
-RR_IMU			imu;
+RR_Telemetry	radio(&TelemetryData);  //Class needs making
+RR_IMU			imu(&IMUData);
 
 void setup()
 {
 
 Serial.begin(115200);
 
+//Create Tasks
 xTaskCreate(vGPSTask,		(signed portCHAR *)"GPS Task",			configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 2, &_htaskGPS);
 xTaskCreate(vIMUTask,		(signed portCHAR *)"IMU Task",			configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 2, &_htaskIMU);
 xTaskCreate(vAltimeterTask, (signed portCHAR *)"Altimeter Task",	configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 3, &_htaskAltiemter);
 xTaskCreate(vDriverTask,	(signed portCHAR *)"Driver Task",		configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 3, &_htaskDriver);
 xTaskCreate(vTelemetryTask, (signed portCHAR *)"Telemetry Task",	configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 1, &_htaskTelemetry);
 xTaskCreate(vLoggerTask,	(signed portCHAR *)"Logger Task",		configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY, &_htaskLogger);
-xTaskCreate(vStateTask,	(signed portCHAR *)"State Machine Task",	configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 1, &_htaskState);
-// start FreeRTOS
+xTaskCreate(vStateTask,		(signed portCHAR *)"State Task",		configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 1, &_htaskState);
+
+//Start Tasks
 vTaskStartScheduler();
 
 //Should not reach here
 Serial.println("Program Exited");
 while(1);
+
 }
 
 void loop()
 {
 
-  /* Nothing to see here. All tasks are handled in xTasks */
+  /* Nothing to see here. All loops are handled in xTasks */
 
 }
 
 static void vGPSTask(void *pvParameters)
 {
+	
 	while(1)
 	{
 		Serial.println("GPS Task");

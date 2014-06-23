@@ -1,8 +1,8 @@
 #include "RR_Altimeter.h"
 
-RR_Altimeter::RR_Altimeter(void): bmp(18001)
+RR_Altimeter::RR_Altimeter(RR_AltimeterData_t *data): bmp(18001)
 {
-
+	altimeterData=data;
 }
 
 void RR_Altimeter::initAltimeter(void)
@@ -18,6 +18,12 @@ void RR_Altimeter::initAltimeter(void)
 void RR_Altimeter::updateAltimeter(void)
 {
 	bmp.getEvent(&altimeter_event);
+	float temperature;
+	bmp.getTemperature(&temperature);
+	altimeterData->temperature=temperature;
+	altimeterData->altitude=bmp.pressureToAltitude(SENSORS_PRESSURE_SEALEVELHPA, 
+		altimeter_event.pressure, temperature);
+
 	if(DBUG)
 	{
 		if (altimeter_event.pressure)

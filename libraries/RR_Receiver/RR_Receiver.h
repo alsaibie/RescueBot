@@ -8,6 +8,8 @@ class RR_Receiver
 {
   public: 
 	  RR_Receiver();
+	  //RR_Receiver(6 Chan)
+	  //RR_Receiver(3 Chan)
 	  //make vector to store data
 	  int getSignal(CHANNEL _chan);
 	  //TODO: Remove outlier readings

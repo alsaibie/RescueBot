@@ -81,7 +81,7 @@ void setup()
   delay(1000);
   // Ask for firmware version
   //GPS.println(PMTK_Q_RELEASE);
-   pinMode(GPSEnable,OUTPUT);
+  pinMode(GPSEnable,OUTPUT);
   digitalWrite(GPSEnable,LOW);
   delay(5000);
   digitalWrite(GPSEnable,HIGH);

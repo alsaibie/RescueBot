@@ -61,7 +61,7 @@ static void vPrintTask(void *pvParameters) {
         while(1){}
     }
 	
-    delay(2000);
+   // delay(2000);
     // Zero count.
     count = 0;
   }

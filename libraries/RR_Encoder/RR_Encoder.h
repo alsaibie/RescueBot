@@ -6,7 +6,7 @@ class RR_Encoder
 {
   public:  
     // CONSTRUCTORS
-	RR_Encoder();
+	RR_Encoder(void);
 	~RR_Encoder(void);
 
 	void Update(void);

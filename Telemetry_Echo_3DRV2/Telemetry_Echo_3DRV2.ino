@@ -7,8 +7,6 @@ void setup()
 	Serial3.begin(57600);
 	Serial.println("Connected to 3DR Telemetry");
 	
-  /* add setup code here */
-
 }
 
 void loop()

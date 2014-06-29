@@ -10,9 +10,11 @@ class RR_Driver
 public:
 	RR_Driver(void);
 	void driveManual(void);
+	
 	void driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
 	void Enable(void);
 	NavigatingState_t NavigatingState;
+	
 	~RR_Driver(void);
 
 
@@ -30,7 +32,7 @@ private:
 		STALL_STALL, STALL_FREE, STALL_RUN, 
 		FREE_STALL, FREE_FREE, FREE_RUN, 
 		RUN_STALL, RUN_FREE} Situation_t;
-	Situation_t isObstacled(RR_IMUData_t &imudata);
+	void isObstacled(RR_IMUData_t &imudata, Situation_t &situation);
 	//Navigation Tasks
 	int8_t getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata);		
 	
@@ -38,6 +40,6 @@ private:
 	RR_Encoder speedometer;
 	RR_Receiver receiver;
 	RR_Motor motors;
-	int8_t leftSpeed, rightSpeed;
+	int16_t leftSpeed, rightSpeed;
 };
 

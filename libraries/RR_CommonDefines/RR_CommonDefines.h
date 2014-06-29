@@ -9,13 +9,16 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #include <ctype.h>
 #include <Arduino.h>
 
+#define DBUG true
+
 typedef enum {SLOW, MEDIUM, FAST} Speed_t;
-typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t;
+typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t, StartMode_t;
 typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
+typedef enum {MANUAL, AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED} DriveMode_t;
 
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
-#define DBUG true
+
 #define MOTOR_GEAR_RATIO 72
 #define ENCODER_COUNT 48
 #define WHEEL_RADIUS 0.07f

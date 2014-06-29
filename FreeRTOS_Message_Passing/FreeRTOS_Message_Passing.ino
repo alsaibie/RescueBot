@@ -81,7 +81,7 @@ void setup() {
     NULL,
     tskIDLE_PRIORITY + 2,
     &blink);
-
+  
   // create print task
   xTaskCreate(vPrintTask,
     (signed portCHAR *)"Task2",

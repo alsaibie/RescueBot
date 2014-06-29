@@ -4,8 +4,11 @@
 #include <Adafruit_10DOF.h>
 #include <Adafruit_LSM303_U.h>
 #include <RR_IMU.h>
+#include <RR_CommonDefines\RR_CommonDefines.h>
+#include <RR_CommonData\RR_CommonData.h>
 
-RR_IMU imu;
+RR_IMUData_t imudata;
+RR_IMU imu(&imudata);
 
 void setup(void)
 {

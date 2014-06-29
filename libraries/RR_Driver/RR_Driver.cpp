@@ -7,6 +7,7 @@ RR_Driver::RR_Driver(void):receiver(), motors(), speedometer()
 void RR_Driver::Enable(void)
 {
 	motors.init();
+
 }
 
 
@@ -61,6 +62,7 @@ void RR_Driver::driveManual(void)
 		rightSpeed=nominalSpeed;
 	}
 
+
 	motors.setM1Speed(leftSpeed);
 	motors.setM2Speed(rightSpeed);
 
@@ -68,14 +70,15 @@ void RR_Driver::driveManual(void)
 
 void RR_Driver::driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)
 {
-	Situation_t Situation=isObstacled();
+	Situation_t Situation;
+	isObstacled(imudata, Situation);
 
 	if(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED)
 
 	switch(Situation)
 	{
 		case CLEAR:
-			cruiseMode(getdHeading(imudata, gpsdata));
+			cruiseModeSimple(getdHeading(imudata, gpsdata));
 			break;
 		case TIPPED:
 			tipoverMode(imudata);
@@ -92,12 +95,12 @@ void RR_Driver::driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_
 			break;
 		case STALL_RUN:
 		case RUN_STALL:
-			cruiseMode(getBearing(imudata, gpsdata));
+			cruiseModeSimple(getdHeading(imudata, gpsdata));
 			break;
 	}
 }
 
-
+ 
 void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 {
 	//Basic behavioral steering based on bearing bracket
@@ -106,7 +109,7 @@ void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 		motors.setSpeeds(SPEED_CRUISE, SPEED_CRUISE);
 	}
 
-	else if(abs(dHeading)>TTHRESHOLD_ANGLE_LOWER && abs(dHeading)<THRESHOLD_ANGLE_UPPER)
+	else if(abs(dHeading)>THRESHOLD_ANGLE_LOWER && abs(dHeading)<THRESHOLD_ANGLE_UPPER)
 	{
 		if(dHeading>0)
 		{
@@ -118,7 +121,7 @@ void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 		}
 	}
 
-	else if(abs(dHeading)>TTHRESHOLD_ANGLE_UPPER)
+	else if(abs(dHeading)>THRESHOLD_ANGLE_UPPER)
 	{
 		if(dHeading>0)
 		{
@@ -160,11 +163,22 @@ void RR_Driver::reciprocatingMode(Speed_t speedlevel)
 	//Timed Back and Forth
 }
 
-RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
+int8_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 {
-	return (gpsdata.Bearing-imudata.fused.heading);
+	int dHeading=gpsdata.Bearing-imudata.fused.heading;
+
+	if(DBUG)
+	{
+		Serial.print("Delta Heading:  ");
+		Serial.print(dHeading);
+		Serial.println(" deg");
+	}
+
+	return dHeading;
 }
 
+void RR_Driver::isObstacled(RR_IMUData_t &imudata, Situation_t &Situation)
+{}	
 
 RR_Driver::~RR_Driver(void)
 {

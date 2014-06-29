@@ -5,8 +5,8 @@
 RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 {
 	gpsData=data;
-	gpsData->LatitudeRadianTarget(TARGET_LAT, "N");
-	gpsData->LongitudeRadianTarget(TARGET_LON, "W");
+	gpsData->LatitudeRadianTarget=toRadians(TARGET_LAT);
+	gpsData->LongitudeRadianTarget=toRadians(TARGET_LON);
 
 	//Default to low on pin at constructor
 	pinMode(GPS_ENABLE_PIN, OUTPUT);
@@ -75,8 +75,8 @@ void RR_GPS::getPosition(void)
 	gpsData->Lat=lat;
 	gpsData->Lon=lon;
 	//Convert to Radians and store accordingly.
-	gpsData->LatitudeRadian=toRadians(latitude,lat);
-	gpsData->LongitudeRadian=toRadians(longitude,lon);
+	gpsData->LatitudeRadian=toRadians(latitude);
+	gpsData->LongitudeRadian=toRadians(longitude);
 
 }
 
@@ -106,21 +106,21 @@ void RR_GPS::getBearing(void)
 	float dlat = latTarget-lat;
 	float dlong = lonTarget-lon;
 
-	float a = sin(dlat/2)*sin(dlat/2)+sin(dlong/2)*sin(dlong/2)*cos(lat1)*cos(lat2);
+	float a = sin(dlat/2)*sin(dlat/2)+sin(dlong/2)*sin(dlong/2)*cos(lat)*cos(latTarget);
 	float c = 2*atan2(sqrt(a),sqrt(1-a));
 	
 	gpsData->DistanceToTarget = R*c;
 
 	// Using the formula for bearing to calculate the required current heading.
-	float y = sin(dlong)*cos(lat2);
-	float x = cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(dlong);
+	float y = sin(dlong)*cos(latTarget);
+	float x = cos(lat)*sin(latTarget)-sin(lat)*cos(latTarget)*cos(dlong);
 	
 	gpsData->Bearing = fmod((atan2(y,x)*57.295779513+360),360); // Multiplied by constant to convert to decimal degrees.
   
 }
 
 
-float RR_GPS::toRadians(float coordinate, char cor)
+float RR_GPS::toRadians(float coordinate)
 {
   float min = fmod(coordinate, 100.0)/60.0;
   float deg = float(int(coordinate/100));

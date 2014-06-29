@@ -21,7 +21,7 @@ class RR_IMU
 {
   public:  
     //Constructors
-	RR_IMU(void);
+	//RR_IMU(void);
 	RR_IMU(RR_IMUData_t *data);
 	//Sensor Objects
 	Adafruit_10DOF dof;

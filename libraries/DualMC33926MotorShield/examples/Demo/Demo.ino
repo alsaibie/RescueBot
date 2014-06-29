@@ -24,7 +24,7 @@ void setup()
   Serial.begin(115200);
   Serial.println("Dual MC33926 Motor Shield");
   md.init();
-  md.setM1Speed(400);
+  md.setM2Speed(0);
   //md.setM2Speed(400);
   delay(3000);
 }

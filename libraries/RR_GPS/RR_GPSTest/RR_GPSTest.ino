@@ -22,6 +22,7 @@ void setup()
 	Serial.begin(115200);
 	gps.Enable();
 	xTaskCreate(vGPSTask,(signed portCHAR *)"GPS Task", configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &gpsTask);
+	vSemaphoreCreateBinary(gpsDataMutex);
 	// start FreeRTOS
 	vTaskStartScheduler();
 	
@@ -44,11 +45,11 @@ static void vGPSTask(void *pvParameters)
 	{
 		if(gps.fix)
 		{
-		//Take Semaphore
+		xSemaphoreTake(gpsDataMutex, portMAX_DELAY);
 		//Update
 			gps.getData();
 			Serial.println(gpsData.Time.Seconds);
-		//Release Semaphore
+		xSemaphoreGive(gpsDataMutex);
 		}
 		else
 		{

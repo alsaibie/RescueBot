@@ -14,6 +14,8 @@ void setup()
 	delay(3000);
 	Serial.println("Driver Test");
 	ScorpioDriver.Enable();
+	
+	
 }
 
 void loop()

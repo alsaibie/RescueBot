@@ -1,23 +1,36 @@
 //-------------------------------RESCUE ROBOT ---------------------------//
 //----------------------------------------------------------------------//
 /*
-Common Data Structures for Passing Information Between Software Components and Threads.
+* Common Data Structures for Passing Information Between Software Components and Threads.
 */
 
 #pragma once
 #include <RR_CommonDefines/RR_CommonDefines.h>
 
+//Telemetry Data
+typedef struct RR_TelemetryOutgoingMessage_t
+{
+	uint16_t msg_timestamp; //time
+	uint8_t launchState;
+	uint8_t navigationalState;
+	uint32_t latitude;
+	uint32_t longitude;
+	uint16_t distanceToTarget;
+	int8_t heading;
+	
+}RR_TelemetryOutgoingMessage_t;
+
+typedef struct RR_TelemetryIncomingMessage_t
+{
+	uint8_t msg_timestamp; //time
+	
+}RR_TelemetryIncomingMessage_t;
 
 //Altimeter Data
 struct RR_AltimeterData_t
 {
 	float altitude;
 	float temperature;
-};
-
-//Telemetry Data
-struct RR_TelemetryData_t
-{
 };
 
 //Navigation Data

@@ -17,7 +17,7 @@ void RR_SDCard::Initialize(void)
 	pinMode(OPENLOG_GRN_PIN, OUTPUT);
 	delay(200);
 	digitalWrite(OPENLOG_GRN_PIN, LOW);
-	//delay(50);
+	delay(200);
 	digitalWrite(OPENLOG_GRN_PIN, HIGH);
 	
   //Wait for OpenLog to respond with '<' to indicate it is alive and recording to a file
@@ -29,7 +29,7 @@ void RR_SDCard::Initialize(void)
  
 
 	char fileName[12]; //Max file name length is "12345678.123" (12 characters)
-	sprintf(fileName, "RBot%04d.txt", 2013);
+	sprintf(fileName, "RBot%04d.txt", 2014);
 
   //Send three control z to enter OpenLog command mode
 	SD_HwSerial->write(26);
@@ -48,6 +48,7 @@ void RR_SDCard::Initialize(void)
 	Serial.println("Broke");
   //Wait for OpenLog to return to waiting for a command
 	while(1) {
+		if(DBUG){Serial.println("Wait for a command");}
 	 if(SD_HwSerial->available())
 		  if(SD_HwSerial->read() == '>') break;
 			 }
@@ -59,6 +60,7 @@ void RR_SDCard::Initialize(void)
 	
   //Wait for OpenLog to indicate file is open and ready for writing
 	while(1) {
+		if(DBUG){Serial.println("Wait to indicate open and ready for writing");}
 	 if(SD_HwSerial->available())
 		  if(SD_HwSerial->read() == '<') break;
 			}

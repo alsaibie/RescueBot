@@ -10,6 +10,11 @@ void RR_Driver::Enable(void)
 
 }
 
+void RR_Driver::Stop(void)
+{
+	motors.setM1Speed(0);
+	motors.setM2Speed(0);
+}
 
 
 void RR_Driver::driveManual(void)

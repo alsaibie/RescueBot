@@ -12,7 +12,10 @@ RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 	pinMode(GPS_ENABLE_PIN, OUTPUT);
 	digitalWrite(GPS_ENABLE_PIN,LOW);
 }
-
+void RR_GPS::Disable(void)
+{
+  digitalWrite(GPS_ENABLE_PIN,LOW);
+}
 void RR_GPS::Enable(void)
 {
   digitalWrite(GPS_ENABLE_PIN,HIGH);

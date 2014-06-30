@@ -10,7 +10,17 @@
 //Telemetry Data
 typedef struct RR_TelemetryOutgoingMessage_t
 {
-	uint16_t msg_timestamp; //time
+    struct Data_t
+    { 
+		uint16_t Year;
+		uint8_t Month, Day;
+    }Date;  
+
+    struct Time_t
+    {
+		uint8_t Hour, Minute, Seconds;
+    }Time;
+
 	uint8_t launchState;
 	uint8_t navigationalState;
 	uint32_t latitude;
@@ -29,8 +39,9 @@ typedef struct RR_TelemetryIncomingMessage_t
 //Altimeter Data
 struct RR_AltimeterData_t
 {
-	float altitude;
-	float temperature;
+	uint32_t altitude;
+	int16_t temperature;
+	bool Launched, Peaked, Landed;
 };
 
 //Navigation Data
@@ -41,17 +52,20 @@ struct RR_NavigationData_t
 //GPS DATA
 struct RR_GPSData_t
 {
-	float	Longitude;	char Lon;
-	float	Latitude;	char Lat;
-	float	LatitudeRadian, LongitudeRadian;
-	float	LatitudeRadianTarget, LongitudeRadianTarget;
-	float	Bearing;
-	int		DistanceToTarget;
-	int		Speed;
+	
+	uint32_t	Longitude;	char Lon;
+	uint32_t	Latitude;	char Lat;
+	uint32_t	LatitudeRadian, LongitudeRadian;
+	uint32_t	LatitudeRadianTarget, LongitudeRadianTarget;
+	bool		fix;
+	int16_t			Bearing;
+	uint16_t		DistanceToTarget;
+	uint8_t			Speed;
 	
 	struct Date_t
 	{
-		uint8_t Year, Month, Day;
+		uint16_t Year;
+		uint8_t Month, Day;
 		//TODO:Change to YYMMDD Format but would need parsing
 	}Date;
 	

@@ -1,13 +1,12 @@
 #pragma once
-#include "RR_CommonDefines.h"
+#include <RR_CommonDefines\RR_CommonDefines.h>
 #include <Arduino.h>
 
 class RR_MOSFET
 {
   public:  
-	enum SWITCHMODE {ON, OFF};
 	RR_MOSFET();
-	void switchMOSFET(SWITCHMODE _mode);
+	void switchMOSFET(SwitchMode_t _mode);
 	~RR_MOSFET(void);
 
   private:

@@ -7,7 +7,7 @@ long time1;
 
 void setup() {
 	delay(4000);
-	Serial.begin(HARDWARE_SERIAL_BAUD_RATE);
+	Serial.begin(56700);
 	Serial.println("Test Setup");
 	SD.Initialize();
 	delay(2000);

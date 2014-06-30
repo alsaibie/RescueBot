@@ -16,6 +16,7 @@ class RR_GPS: public Adafruit_GPS
     // CONSTRUCTORS
 	RR_GPS(RR_GPSData_t *data);
 	void Enable(void);
+	void Disable(void);
 	void Update(void);
 	void getData(void);
 	~RR_GPS(void);

@@ -10,9 +10,9 @@ class RR_Driver
 public:
 	RR_Driver(void);
 	void driveManual(void);
-	
 	void driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
 	void Enable(void);
+	void Stop(void);
 	NavigatingState_t NavigatingState;
 	
 	~RR_Driver(void);

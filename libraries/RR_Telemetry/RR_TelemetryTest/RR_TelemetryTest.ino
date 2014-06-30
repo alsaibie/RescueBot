@@ -8,6 +8,9 @@ void setup()
 {  
 	outgoingMessage.latitude=5;
 	outgoingMessage.longitude=200000;
+	outgoingMessage.Date.Year=2014;
+	outgoingMessage.Date.Month=06;
+	outgoingMessage.Date.Day=29;
 }
 
 void loop()

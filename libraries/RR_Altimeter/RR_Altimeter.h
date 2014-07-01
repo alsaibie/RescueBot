@@ -17,16 +17,17 @@ class RR_Altimeter
 	
 	//RescueBot Methods
 	void initAltimeter(void);
-	void updateAltimeter(void);
+	void updateAltimeter(AltimeterTask_t altimeterTask=STANDBY, uint16_t SamplingTime=100L);
 	void DisplayAltimeterDetails(void);
 	//TODO: add sensoraverage object
 	//Handlers
     sensors_event_t altimeter_event;
-
 	//Destructor
 	~RR_Altimeter(void);
   private:
 	 RR_AltimeterData_t *altimeterData; 
+	 uint8_t checkPeakInd;
+	 uint32_t checkLandingAltitude;
 };
 
 

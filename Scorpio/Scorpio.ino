@@ -308,6 +308,7 @@ static void vAltimeterTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
 	bool taskOn=false;
+	AltimeterTask_t altimeterTask=STANDBY;
 	// -------------------- //
 	while(1){
 		switch (mainState){
@@ -316,6 +317,7 @@ static void vAltimeterTask(void *pvParameters){
 					taskOn=true;
 					altimeter.initAltimeter();
 				}
+				altimeterTask=checkLAUNCH;
 				SamplingTime= 500L;
 				break;
 			case ASCENDING:
@@ -323,6 +325,7 @@ static void vAltimeterTask(void *pvParameters){
 					taskOn=true;
 					altimeter.initAltimeter();
 				}
+				altimeterTask=checkPEAK;
 				SamplingTime= 20L;
 				break;
 			case LANDING:
@@ -331,6 +334,7 @@ static void vAltimeterTask(void *pvParameters){
 					altimeter.initAltimeter();
 				}
 				SamplingTime= 100L;
+				altimeterTask=checkLANDING;
 				break;
 			case LANDED: case NAVIGATING: case FINISHED:
 				if(taskOn){
@@ -343,13 +347,13 @@ static void vAltimeterTask(void *pvParameters){
 
 		if(taskOn){
 			if(DBUG) {Serial.println("Altimeter Task");}
-			altimeter.updateAltimeter();
+			altimeter.updateAltimeter(altimeterTask, SamplingTime); //Depending on the task the update function will perform it and update the
+													//data struct flags accordingly. 
 			xSemaphoreGive(AltimeterSemaphore);
 	
 			//Update Relevant Telemetry Data
 			xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
-			//No need to take IMUSephore since it won't be updated anywhere else but this thread. Is this safe?
-			//TelemetryOutgoingData.heading=
+			TelemetryOutgoingData.altitude=AltimeterData.altitude;
 			xSemaphoreGive(TelemetryMutex);
 
 			//Update Relevant Logger Data

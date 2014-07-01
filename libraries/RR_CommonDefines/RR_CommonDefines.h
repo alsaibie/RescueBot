@@ -16,6 +16,8 @@ typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainS
 typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
 typedef enum {MANUAL, AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED} DriveMode_t;
 typedef enum {ON, OFF} SwitchMode_t; 
+typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
+#define LAUNCH_THRESHOLD 100
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
 

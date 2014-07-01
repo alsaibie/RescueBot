@@ -27,6 +27,7 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	uint32_t longitude;
 	uint16_t distanceToTarget;
 	int8_t heading;
+	uint16_t altitude;
 	
 }RR_TelemetryOutgoingMessage_t;
 
@@ -39,6 +40,7 @@ typedef struct RR_TelemetryIncomingMessage_t
 //Altimeter Data
 struct RR_AltimeterData_t
 {
+	uint32_t baseAltitude, maxAltitude;
 	uint32_t altitude;
 	int16_t temperature;
 	bool Launched, Peaked, Landed;

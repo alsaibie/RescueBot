@@ -7,10 +7,52 @@ RR_Telemetry::RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_Tel
 {
 	telemetryOutMessage=myOutgoingdata;
 	telemetryInMessage=myIncomingdata;
-	incomingAddress=(byte*)&telemetryInMessage;
+	incomingAddress=(byte*)telemetryInMessage;
 	Serial3.begin(56700);
 }
 
+
+bool RR_Telemetry::decodeMessage(void){
+	if(Serial3.available() >= 3){
+		while(Serial3.read() != 0x06){
+			if(Serial3.available() < 3)
+				return false;
+		}
+		if(Serial3.read() != 0x85){
+			if(DBUG) {Serial.println("Header Doesn't Match");}
+			return false;
+		}
+		if(Serial3.read()!=MSG_INPACKETSIZE) {
+			if(DBUG) {Serial.println("Message Received Size Don't Match");}
+			return false;
+			}	
+		int receive_array_ind=0;
+		while (Serial3.available() && receive_array_ind<=MSG_INPACKETSIZE){
+			databufferIncoming[receive_array_ind++] = Serial3.read();
+		}
+		if((receive_array_ind-1)!=MSG_INPACKETSIZE) {
+			if(DBUG) {Serial.println("Message Buffer Not Same Size");}
+			return false;
+			}
+		int inCS=MSG_INPACKETSIZE;
+		for (int i=0; i<MSG_INPACKETSIZE; i++){
+			inCS^=databufferIncoming[i];
+		}
+		if(inCS != databufferIncoming[receive_array_ind-1]){
+			if(DBUG) {Serial.println("Checksum bad :(");}
+			return false;
+		}
+		else{	
+		if(DBUG) {Serial.println("Checksum Good :D");}
+		}
+		memcpy(incomingAddress, databufferIncoming, MSG_INPACKETSIZE);
+		return true;
+		if(DBUG){
+		}
+
+	}
+
+}
 
 void RR_Telemetry::encodeMessage(void)
 {
@@ -43,27 +85,16 @@ void RR_Telemetry::Update(void)
 {
 	encodeMessage();
 	transmitOutgoingBuffer();
+	if(decodeMessage())
+		{
+			if(DBUG){
+				Serial.println(telemetryInMessage->Joystick.Pad_A.Horizontal);
+			}
+	}
 
 }
 
 
-void RR_Telemetry::decodeMessage(RR_TelemetryIncomingMessage_t* myIncomingdata)
-{
-	/*
-    int *q = (int*)data;    
-	msgPacket->message_id = *q;       q++;    
-	msgPacket->sender = *q;   q++;    
-
-    char *p = (char*)q;
-    int i = 0;
-    while (i < BUFSIZE)
-    {
-        msgPacket->message[i] = *p;
-        p++;
-        i++;
-    }
-	*/
-}
 
 void RR_Telemetry::printMsg(RR_TelemetryOutgoingMessage_t* myOutgoingdata)
 {

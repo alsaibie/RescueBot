@@ -63,8 +63,8 @@ RR_Altimeter	altimeter(&AltimeterData);
 RR_Driver		driver;
 RR_GPS			gps(&GPSData);
 RR_MOSFET		nichrome;
-//RR_SDCard		sdcard; //Class needs fixing
-RR_Telemetry	radio(&TelemetryOutgoingData,&TelemetryIncomingData);  //Class needs making
+RR_SDCard		sdcard(&LoggerData); 
+RR_Telemetry	radio(&TelemetryOutgoingData,&TelemetryIncomingData);
 RR_IMU			imu(&IMUData);
 
 
@@ -88,7 +88,7 @@ void setup()
 
 	GPSData.fix=false;
 	AltimeterData.Launched=false; AltimeterData.Peaked=false; AltimeterData.Landed=false;
-
+	
 	//Create Tasks
 	xTaskCreate(vGPSTask,		(signed portCHAR *)"GPS Task",			configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 2, &_htaskGPS);
 	xTaskCreate(vIMUTask,		(signed portCHAR *)"IMU Task",			configMINIMAL_STACK_SIZE + 50, NULL, tskIDLE_PRIORITY + 2, &_htaskIMU);
@@ -132,7 +132,8 @@ static void vStateTask (void *pvParameters)
 	// Task is always On!
 	// -------------------- //
 	while(1){
-		if(DBUG) {Serial.println("State Machine Task");}
+		if(DBUG) {Serial.println("State Machine Task, State: ");}
+		if(DBUG) {Serial.println(mainState);}
 		switch(mainState){
 			case LAUNCHING:
 				SamplingTime=500L;
@@ -230,17 +231,24 @@ static void vGPSTask(void *pvParameters){
 			}		
 			//Update Relevant Telemetry Data
 			if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
-			memcpy(&GPSData.Date, &TelemetryOutgoingData.Date, sizeof(GPSData.Date));
-			memcpy(&GPSData.Time, &TelemetryOutgoingData.Time, sizeof(GPSData.Time));
-			TelemetryOutgoingData.latitude=GPSData.Latitude;
-			TelemetryOutgoingData.longitude=GPSData.Longitude;
-			TelemetryOutgoingData.distanceToTarget=GPSData.DistanceToTarget;
+			memcpy(&TelemetryOutgoingData.Date, &GPSData.Date, sizeof(GPSData.Date));
+			memcpy(&TelemetryOutgoingData.Time, &GPSData.Time, sizeof(GPSData.Time));
+			TelemetryOutgoingData.Latitude=GPSData.Latitude;
+			TelemetryOutgoingData.Longitude=GPSData.Longitude;
+			TelemetryOutgoingData.DistanceToTarget=GPSData.DistanceToTarget;
+			TelemetryOutgoingData.Bearing=GPSData.Bearing;
 			xSemaphoreGive(TelemetryMutex);
 			}
 
 			//Update Relevant Logger Data
 			if(xSemaphoreTake(LoggerMutex, portMAX_DELAY)){
-			//LoggerData.... = ...
+			memcpy(&LoggerData.GPSTime, &GPSData.Time, sizeof(GPSData.Date));
+			LoggerData.GPS.Latitude=GPSData.Latitude;
+			LoggerData.GPS.Lat=GPSData.Lat;
+			LoggerData.GPS.Longitude=GPSData.Longitude;
+			LoggerData.GPS.Lon=GPSData.Lon;
+			LoggerData.GPS.DistanceToTarget=GPSData.DistanceToTarget;
+			LoggerData.GPS.Bearing=GPSData.Bearing;
 			xSemaphoreGive(LoggerMutex);
 			}
 		}
@@ -358,7 +366,7 @@ static void vAltimeterTask(void *pvParameters){
 
 			//Update Relevant Logger Data
 			xSemaphoreTake(LoggerMutex, portMAX_DELAY);
-			//LoggerData.... = ...
+			LoggerData.Altitude=AltimeterData.altitude;
 			xSemaphoreGive(LoggerMutex);
 		}
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);	
@@ -434,13 +442,13 @@ static void vLoggerTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
 	// -------------------- //
+	sdcard.Initialize();
 	while(1)
 	{
 		//Serial.println("Logger Task");
 		xSemaphoreTake(LoggerMutex, portMAX_DELAY);
-		//log.update
+		sdcard.updateLog();
 		xSemaphoreGive(LoggerMutex);
-
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
 }

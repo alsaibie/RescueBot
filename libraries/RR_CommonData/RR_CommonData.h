@@ -21,21 +21,53 @@ typedef struct RR_TelemetryOutgoingMessage_t
 		uint8_t Hour, Minute, Seconds;
     }Time;
 
-	uint8_t launchState;
-	uint8_t navigationalState;
-	uint32_t latitude;
-	uint32_t longitude;
-	uint16_t distanceToTarget;
-	int8_t heading;
-	uint16_t altitude;
-	
+	uint8_t LaunchState;
+	uint8_t NavigationalState;
+	float Latitude;
+	float Longitude;
+	uint16_t DistanceToTarget;
+	int8_t Heading;
+	int16_t	Bearing;
+	uint16_t Altitude;	
 }RR_TelemetryOutgoingMessage_t;
 
 typedef struct RR_TelemetryIncomingMessage_t
 {
-	uint8_t msg_timestamp; //time
+    struct Joystick_t{
+
+        struct Pad_t{
+			int8_t Vertical, Horizontal;
+        }Pad_A, Pad_B;
+    }Joystick;
 	
 }RR_TelemetryIncomingMessage_t;
+
+//Logger Data
+struct RR_LoggerData_t
+{
+	struct GPSData_t{
+		float	Longitude;	char *Lon;
+		float	Latitude;	char *Lat;
+		bool		fix;
+		int16_t		Bearing;
+		uint16_t	DistanceToTarget;
+	}GPS;
+	struct Time_t
+	{
+		uint8_t Hour, Minute, Seconds;
+		//TODO:Change to HHMMSS Format but would need parsing
+	}GPSTime;
+	uint16_t Altitude;
+
+	struct State_t{
+		MainState_t mainstate;
+		NavigatingState_t navstate;
+	}State;
+
+	struct Navigation_t{
+		int16_t speed;
+	}Navigation;
+};
 
 //Altimeter Data
 struct RR_AltimeterData_t
@@ -54,11 +86,10 @@ struct RR_NavigationData_t
 //GPS DATA
 struct RR_GPSData_t
 {
-	
-	uint32_t	Longitude;	char Lon;
-	uint32_t	Latitude;	char Lat;
-	uint32_t	LatitudeRadian, LongitudeRadian;
-	uint32_t	LatitudeRadianTarget, LongitudeRadianTarget;
+	float	Longitude;	char *Lon;
+	float	Latitude;	char *Lat;
+	float	LatitudeRadian, LongitudeRadian;
+	float	LatitudeRadianTarget, LongitudeRadianTarget;
 	bool		fix;
 	int16_t			Bearing;
 	uint16_t		DistanceToTarget;
@@ -104,8 +135,3 @@ struct RR_IMUData_t
 
 };
 
-//Logger Data
-struct RR_LoggerData_t
-{
-
-};

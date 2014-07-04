@@ -1,35 +1,42 @@
 #pragma once
-
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <RR_CommonDefines\RR_CommonDefines.h>
 #include <RR_CommonData\RR_CommonData.h>
-//define message types here
-#define COORDINATE_MSG "$COORDINATE,"
-#define SPEED_MSG "$SPEED,"
-#define COURSE_MSG "$COURSE,"
-#define ALTITUDE_MSG "$ALTITUDE,"
-#define GPS_FIX_MSG "$GPS_FIX_TIME,"
 
+//define message types here
+/* GPS Data Format 
+* $GPS,mcutime,Fix,GPSTIME,Latitude,Lat,Longitude,Lon,DistanceToTarget,Bearing,#
+*/
+#define GPS_LOG_MSG "$GPS"
+
+/* STATE Format 
+* $STA,mcutime,MainState,NavigationalState,# 
+*/
+#define STATE_LOG_MSG "$STA"
+
+/* Navigational Data Format 
+* $NAV,mcutime,Speed,#
+*/
+#define NAVIGATION_LOG_MSG "$NAV"
+
+/* Altitude Format 
+* $ALT,mcutime,Altitude,#
+*/
+#define ALTITUDE_LOG_MSG "$ALT"
+#define comma Serial2.print(",")
+#define hashEnd Serial2.println("#")
+// # Signifies end of message
 class RR_SDCard
 {
-public:
-	RR_SDCard(HardwareSerial *ser);
+	public:
+	RR_SDCard(RR_LoggerData_t *data);
 	void Initialize(void);
 	void WriteMessage(float _msg_value, const char *_msg_type);
 	void Write(const char *_str);
+	void updateLog(void);
 	//const char readFile(void); // Future implementation
-	
 	~RR_SDCard(void);
-private:
-	//char fileName[12];
-	HardwareSerial *SD_HwSerial;
-	//SoftwareSerial SD_Serial;
-	
 
+	private:
+	RR_LoggerData_t *loggerData;
 };
 

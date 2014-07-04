@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #define MSG_OUTPACKETSIZE sizeof(RR_TelemetryOutgoingMessage_t)
-#define MSG_INPACKETSIZE sizeof(RR_TelemetryOutgoingMessage_t)
+#define MSG_INPACKETSIZE sizeof(RR_TelemetryIncomingMessage_t)
 
 class RR_Telemetry 
 {
@@ -24,12 +24,12 @@ class RR_Telemetry
 	  void encodeMessage(void); //Packs Message Struct and adds to buffer
 	  void transmitOutgoingBuffer(void);
 	  void receiveIncomingBuffer(void);
-	  void decodeMessage(RR_TelemetryIncomingMessage_t* myIncomingdata);
+	  bool decodeMessage(void);
 	  RR_TelemetryOutgoingMessage_t *telemetryOutMessage;
 	  RR_TelemetryIncomingMessage_t *telemetryInMessage;
 	  uint8_t *incomingAddress;
 	  uint8_t databufferOutgoing[MSG_OUTPACKETSIZE+10];
-	  uint8_t databufferIncoming[MSG_INPACKETSIZE+5];
+	  uint8_t databufferIncoming[MSG_INPACKETSIZE+10];
 };
 
 

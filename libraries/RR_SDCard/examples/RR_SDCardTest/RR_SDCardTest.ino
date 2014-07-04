@@ -1,26 +1,36 @@
+#include <RR_CommonData.h>
 #include <RR_CommonDefines.h>
 #include <RR_SDCard.h>
 
-RR_SDCard SD(&Serial2); 
+RR_LoggerData_t loggerData;
+RR_SDCard SD(&loggerData);
+
 char timemillis[12];
 long time1;
 
 void setup() {
 	delay(4000);
 	Serial.begin(56700);
-	Serial.println("Test Setup");
+	Serial.println("SD Card Test");
 	SD.Initialize();
 	delay(2000);
-	Serial.println(COORDINATE_MSG);
-	SD.Write("Hi THIS IS A NIGHT TEST");
-	
+	loggerData.GPS.fix=true;
+	loggerData.GPS.Latitude=3347.342;
+	loggerData.GPS.Lat="N";
+	loggerData.GPS.Longitude=8424.003;
+	loggerData.GPS.Lon="W";
+	loggerData.GPSTime.Hour=12;
+	loggerData.GPSTime.Minute=50;
+	loggerData.GPSTime.Seconds=15;
+	loggerData.State.mainstate=NAVIGATING;
+	loggerData.State.navstate=CRUISING;
+	loggerData.Navigation.speed=230;
+	Serial.println("Setup Complete");
 }
 
 void loop() {
-	
-	time1=millis();
-	SD.WriteMessage(millis()-time1, "$Time");
-	Serial.println(millis()-time1);
-	
-  
+	uint32_t time1=millis();
+	SD.updateLog();
+	Serial.println(millis()-time1);  
+	delay(1000);
 }

@@ -2,3 +2,9 @@
 *.vcxproj
 *.filters
 *.xml
+Visual Micro/
+*.opensdf
+*.tlog
+*.idb
+*.unsuccessfulbuild
+*.lastbuildstate

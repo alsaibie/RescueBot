@@ -1,37 +1,35 @@
-//-------------------------------RESCUE ROBOT ---------------------------//
-//----------------------------------------------------------------------//
-/*
-Low Level Motor Control with a simple H-Bridge class. Designed to Handle one motor with predefined hardware pin connections
-
-Should be wrapped with a driver class specific to the robot being used.
-Methods:
-
-Enable(): Run in setup to put motor in forward ready mode
-Speed(0:Stop-255:Max, FORWARD/BACKWARD)
-Stop(): Quick stop for motor. 
-
-TODO:
-Improve speed change smoothness. Things to consider: change PWM frequency and/or have delayed inceremental analogwrite
-
-*/
 #pragma once
-#if (ARDUINO >= 100)
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-#include <../RR_CommonDefines/RR_CommonDefines.h>
+#include "RR_CommonDefines.h"
+#include <Arduino.h>
 
 class RR_Motor
 {
-public:
-	RR_Motor(void);
-	void Enable(void);
-	void Speed(int _spd, int _dir);
-	void Stop(void);
+  public:  
+    // CONSTRUCTORS
+	RR_Motor(); // Default pin selection.
+	RR_Motor(unsigned char M1DIR, unsigned char M1PWM, unsigned char M1FB,
+                           unsigned char M2DIR, unsigned char M2PWM, unsigned char M2FB,
+                           unsigned char nD2, unsigned char nSF); // User-defined pin selection. 
 	~RR_Motor(void);
-
-private:
-	int _current_dir, _current_spd;
+    
+    // PUBLIC METHODS
+    void init(); // Initialize TIMER 1, set the PWM to 20kHZ. 
+    void setM1Speed(int speed); // Set speed for M1.
+    void setM2Speed(int speed); // Set speed for M2.
+    void setSpeeds(int m1Speed, int m2Speed); // Set speed for both M1 and M2.
+    unsigned int getM1CurrentMilliamps(); // Get current reading for M1. 
+    unsigned int getM2CurrentMilliamps(); // Get current reading for M2.
+    unsigned char getFault(); // Get fault reading.
+    
+  private:
+    unsigned char _nD, _EN;
+    unsigned char _M1DIR;
+    unsigned char _M2DIR;
+	static const unsigned char _M1PWM = MOTOR1_PWM_PIN;
+	static const unsigned char _M2PWM = MOTOR2_PWM_PIN;
+    unsigned char _nSF;
+    unsigned char _M1FB;
+    unsigned char _M2FB;
 };
+
 

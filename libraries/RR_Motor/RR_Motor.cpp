@@ -1,58 +1,126 @@
 #include "RR_Motor.h"
 
+// Constructors ////////////////////////////////////////////////////////////////
+
 RR_Motor::RR_Motor(void)
 {
-	_current_dir=0;
-	_current_spd=0;
+  //Pin map
+  _nD = MOTOR_D_PIN;
+  _EN = MOTOR_ENABLE_PIN;
+  _M1DIR = M1DIR_PIN;
+  _M2DIR = M2DIR_PIN;
+  _nSF = MOTOR_SF_PIN;
+  _M1FB = MOTOR1_FB_PIN; 
+  _M2FB = MOTOR2_FB_PIN;
 }
 
-void RR_Motor::Enable(void)
+RR_Motor::RR_Motor(unsigned char M1DIR, unsigned char M1PWM, unsigned char M1FB,
+                                               unsigned char M2DIR, unsigned char M2PWM, unsigned char M2FB,
+                                               unsigned char nD, unsigned char nSF)
 {
-	pinMode(MOTOR1_ENABLE_PIN, OUTPUT); 
-	//Set Speed to Zero
-	analogWrite(MOTOR1_ENABLE_PIN, 0);
-	//Set Direction to Forward
-	digitalWrite(MOTOR1_LOGIC1_PIN,LOW);
-	digitalWrite(MOTOR1_LOGIC2_PIN,HIGH);
-	
+  //Pin map
+  //PWM1 and PWM2 cannot be remapped because the library assumes PWM is on timer1
+  _nD = nD;
+  _M1DIR = M1DIR;
+  _M2DIR = M2DIR;
+  _nSF = nSF;
+  _M1FB = M1FB; 
+  _M2FB = M2FB;
 }
 
-void RR_Motor::Speed(int _spd, int _dir)
+// Public Methods //////////////////////////////////////////////////////////////
+void RR_Motor::init()
 {
-	
-	//Check if direction is changing
-	if(_dir!=_current_dir)
-	{
-		_current_dir=_dir;
-		//Stop first
-		analogWrite(MOTOR1_ENABLE_PIN, 0);
-		delay(30);
-
-		if(_dir==1)
-		{
-			digitalWrite(MOTOR1_LOGIC1_PIN,LOW);
-			digitalWrite(MOTOR1_LOGIC2_PIN,HIGH);
-		}
-		else if (_dir==0)
-		{
-			digitalWrite(MOTOR1_LOGIC1_PIN,HIGH);
-			digitalWrite(MOTOR1_LOGIC2_PIN,LOW);
-		}
-		
-	}
-	//Change Speed
-	analogWrite(MOTOR1_ENABLE_PIN, _spd);
-	_current_spd=_spd;
+// Define pinMode for the pins and set the frequency for timer1.
+  pinMode(_M1DIR,OUTPUT);
+  pinMode(_M1PWM,OUTPUT);
+  pinMode(_M1FB,INPUT);
+  pinMode(_M2DIR,OUTPUT);
+  pinMode(_M2PWM,OUTPUT);
+  pinMode(_M2FB,INPUT);
+  pinMode(_nD,OUTPUT);
+  pinMode(_EN,OUTPUT);
+  digitalWrite(_nD,HIGH); // default to on
+  digitalWrite(_EN,HIGH); // default to on
+  pinMode(_nSF,INPUT);
 }
-
-
-void RR_Motor::Stop(void)
+// Set speed for motor 1, speed is a number betwenn -400 and 400
+void RR_Motor::setM1Speed(int speed)
 {
+  speed=-speed; //Because the wires are flipped
+  unsigned char reverse = 0;
+  
+  if (speed > 400)  // Max PWM dutycycle
+    speed = 400;
 	
-	digitalWrite(MOTOR1_LOGIC1_PIN,LOW);
-	digitalWrite(MOTOR1_LOGIC2_PIN,LOW);
-	analogWrite(MOTOR1_ENABLE_PIN, 0);
+  if (speed < -400)  // Max PWM dutycycle
+    speed = -400;
+  if (speed < 0)
+  {
+    speed = 400+speed;  // Make speed a positive quantity
+    reverse = 1;  // Preserve the direction
+  }
+
+    
+  analogWrite(_M1PWM,speed * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  if (reverse)
+    digitalWrite(_M1DIR,HIGH);
+  else
+    digitalWrite(_M1DIR,LOW);
 }
+
+// Set speed for motor 2, speed is a number betwenn -400 and 400
+void RR_Motor::setM2Speed(int speed)
+{
+	speed=-speed; //Because the wires are flipped
+  unsigned char reverse = 0;
+    
+  if (speed > 400)  // Max PWM dutycycle
+    speed = 400;
+	
+  if (speed < -400)  // Max PWM dutycycle
+    speed = -400;
+
+  if (speed < 0)
+  {
+    speed = 400+speed;   // Make speed a positive quantity
+    reverse = 1;  // Preserve the direction
+  }
+
+  analogWrite(_M2PWM,speed * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  if (reverse)
+    digitalWrite(_M2DIR,HIGH);
+  else
+    digitalWrite(_M2DIR,LOW);
+}
+
+// Set speed for motor 1 and 2
+void RR_Motor::setSpeeds(int m1Speed, int m2Speed)
+{
+  setM1Speed(m1Speed);
+  setM2Speed(m2Speed);
+}
+
+// Return motor 1 current value in milliamps.
+unsigned int RR_Motor::getM1CurrentMilliamps()
+{
+  // 5V / 1024 ADC counts / 525 mV per A = 9 mA per count
+  return analogRead(_M1FB) * 9;
+}
+
+// Return motor 2 current value in milliamps.
+unsigned int RR_Motor::getM2CurrentMilliamps()
+{
+  // 5V / 1024 ADC counts / 525 mV per A = 9 mA per count
+  return analogRead(_M2FB) * 9;
+}
+
+// Return error status
+unsigned char RR_Motor::getFault()
+{
+  return !digitalRead(_nSF);
+}
+
 
 RR_Motor::~RR_Motor(void)
 {

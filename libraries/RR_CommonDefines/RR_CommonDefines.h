@@ -7,53 +7,82 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #pragma once
 #include <string.h>
 #include <ctype.h>
+#include <Arduino.h>
 
+#define DBUG true
+
+typedef enum {SLOW, MEDIUM, FAST} Speed_t;
+typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t, StartMode_t;
+typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
+typedef enum {MANUAL, AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED} DriveMode_t;
+typedef enum {ON, OFF} SwitchMode_t; 
+typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
+
+#define LAUNCH_THRESHOLD 100
+#define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
+
+#define MOTOR_GEAR_RATIO 72
+#define ENCODER_COUNT 48
+#define WHEEL_RADIUS 0.07f
 //WINNING NUMBERS - MODIFY ACCORDINGLY
 #define TARGET_LAT 3347.342f  //N  ddmm.mmmm
 #define TARGET_LON - 8424.003f //W dddmm.mmmm
 //#define CURRENT_LOCATION F("21.12345,W, 21.12345,N")
-//STATE FLAGS
-#define LAUNCHING 0
-#define LAUNCHED 1
-#define LANDED 2
-#define NAVIGATING 3
-#define FINISHED 4
+
 //GENERAL
 #define PI	3.14159f
 #define HARDWARE_SERIAL_BAUD_RATE 9600
 #define STAGE1_SAMPLING 100000 //.1sec
 #define STAGE2_SAMPLING 10000 //.01sec
 #define STAGE3_SAMPLING 100000 //.1sec
+
 //GPS 
-#define GPS_VCC_PIN 4
-#define GPS_ENABLE_PIN 8
-#define GPS_RX_PIN 9 //SoftwareSerial Only
-#define GPS_TX_PIN 10 //SoftwareSerial Only
-#define USING_GPS_SOFTWARESERIAL 0
+#define GPS_ENABLE_PIN 2
+
+//SERIALS
+#define GPS_Serial Serial1
+
+//MACRO FUNCTIONS
+
 //MOTOR 
-#define MOTOR1_ENABLE_PIN 6
-#define MOTOR1_LOGIC1_PIN 2
-#define MOTOR1_LOGIC2_PIN 3
 #define FORWARD 1
 #define BACKWARD 0
-//SERVO
-#define SERVO_CONTROL_PIN 5
-//PRESSURE SENSOR
-#define PSENSOR_ENABLE_PIN 7
-#define ACTUALSEAPRESSURE 101500
-#define PRESSURERUNNINGAVGSIZE 10
-#define LIFTOFFTHRESHOLD 25.0f
-//ACCELEROMETER
-#define ACC_RUNNINGAVGSIZE 5
-#define ACC_X_ANALOGPIN 1
-#define ACC_Y_ANALOGPIN 2
-#define ACC_Z_ANALOGPIN 3
-#define VOLTAGEREFERENCE 5
+#define M1DIR_PIN 23
+#define M2DIR_PIN 21
+#define MOTOR1_FB_PIN A0
+#define MOTOR2_FB_PIN A1
+#define MOTOR_SF_PIN 13
+#define MOTOR_ENABLE_PIN 16
+#define MOTOR_D_PIN 17
+#define MOTOR1_PWM_PIN 22
+#define MOTOR2_PWM_PIN 20
+
+//DRIVER
+#define THRESHOLD_ANGLE_LOWER 10
+#define THRESHOLD_ANGLE_UPPER 60
+#define SPEED_MAX 400
+#define SPEED_CRUISE 350
+#define SPEED_MANEUVER 300
+#define SPEED_LOW 200
+
+//ENCODER
+#define ENCA1_PIN 3
+#define ENCA2_PIN 4
+#define ENCB1_PIN 5
+#define ENCB2_PIN 6
+
 //SD CARD
-#define OPENLOG_RX_PIN 11 //SoftwareSerial Only
-#define OPENLOG_TX_PIN 12 //SoftwareSerial Only
-#define OPENLOG_GRN_PIN 13 //Reset Pin
+#define OPENLOG_GRN_PIN 11 //Reset Pin
+
+//MOSFET
+#define MOSFET_PIN 12
+
+//RECEIVER
+#define THRO_RX_PIN 3
+#define AILE_RX_PIN 4
+#define ELEV_RX_PIN 5
+#define RUDD_RX_PIN 6
 
 
 

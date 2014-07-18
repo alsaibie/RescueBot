@@ -8,9 +8,9 @@
 class RR_Driver
 {
 public:
-	RR_Driver(void);
+	RR_Driver(RR_NavigationData_t *data);
 	void driveManual(void);
-	void driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
+	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
 	void Enable(void);
 	void Stop(void);
 	NavigatingState_t NavigatingState;
@@ -41,5 +41,6 @@ private:
 	RR_Receiver receiver;
 	RR_Motor motors;
 	int16_t leftSpeed, rightSpeed;
+	RR_NavigationData_t *navigationdata;
 };
 

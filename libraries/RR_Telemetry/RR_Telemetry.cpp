@@ -8,6 +8,7 @@ RR_Telemetry::RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_Tel
 	telemetryOutMessage=myOutgoingdata;
 	telemetryInMessage=myIncomingdata;
 	incomingAddress=(byte*)telemetryInMessage;
+	telemetryInMessage->Joystick.Pad_Left.Y_Axis=0;
 	Serial3.begin(56700);
 }
 
@@ -88,10 +89,10 @@ void RR_Telemetry::Update(void)
 	if(decodeMessage())
 		{
 			if(DBUG){
-				Serial.println(telemetryInMessage->Joystick.Pad_A.Horizontal);
+				Serial.print("Joystick: ");
+				Serial.println(telemetryInMessage->Joystick.Pad_Right.Y_Axis);
 			}
 	}
-
 }
 
 

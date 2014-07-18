@@ -60,7 +60,7 @@ RR_TelemetryOutgoingMessage_t	TelemetryOutgoingData;
 *
 */
 RR_Altimeter	altimeter(&AltimeterData);
-RR_Driver		driver;
+RR_Driver		driver(&NavigationData);
 RR_GPS			gps(&GPSData);
 RR_MOSFET		nichrome;
 RR_SDCard		sdcard(&LoggerData); 
@@ -173,7 +173,7 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=500L;
 				if(xSemaphoreTake(GPSSemaphore, portMAX_DELAY)){
 					if(GPSData.DistanceToTarget<10){
-						mainState=FINISHED;
+						//mainState=FINISHED;
 					}
 				}
 				break;
@@ -217,7 +217,7 @@ static void vGPSTask(void *pvParameters){
 		}
 		if(taskOn)
 		{
-			if(DBUG) {Serial.println("GPS Task");}
+			if(0) {Serial.println("GPS Task");}
 			while(!gps.newGPSData){
 				gps.Update();
 			}
@@ -281,21 +281,20 @@ static void vIMUTask(void *pvParameters){
 			case NAVIGATING:
 				if(!taskOn){
 					taskOn=true;
-					SamplingTime= 100L;
+					SamplingTime= 500L;
 					imu.initIMU();
 				}
 				break;
 		}
 
 		if(taskOn){
-			if(DBUG) {Serial.println("IMU Task");}
+			if(0) {Serial.println("IMU Task");}
 			imu.updateIMU();
 			xSemaphoreGive(IMUSemaphore);
-	
 			//Update Relevant Telemetry Data
 			xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 			//No need to take IMUSephore since it won't be updated anywhere else but this thread. Is this safe?
-			TelemetryOutgoingData.heading=IMUData.fused.heading;
+			TelemetryOutgoingData.Heading=IMUData.fused.heading;
 			xSemaphoreGive(TelemetryMutex);
 
 			//Update Relevant Logger Data
@@ -361,7 +360,7 @@ static void vAltimeterTask(void *pvParameters){
 	
 			//Update Relevant Telemetry Data
 			xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
-			TelemetryOutgoingData.altitude=AltimeterData.altitude;
+			TelemetryOutgoingData.Altitude=AltimeterData.altitude;
 			xSemaphoreGive(TelemetryMutex);
 
 			//Update Relevant Logger Data
@@ -403,7 +402,7 @@ static void vDriverTask(void *pvParameters){
 				}
 				else if(driveMode==AUTONOMOUS_SIMPLE){
 					//TODO: Figure out an efficient way to take and wait for multiple semaphores. 
-					driver.driveAutonomous(NavigationData, GPSData, IMUData, LoggerData);
+//					driver.driveAutonomous(NavigationData, GPSData, IMUData, LoggerData);
 				}
 				break;
 			case FINISHED:

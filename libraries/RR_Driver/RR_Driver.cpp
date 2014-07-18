@@ -1,7 +1,8 @@
 #include "RR_Driver.h"
 
-RR_Driver::RR_Driver(void):receiver(), motors(), speedometer()
+RR_Driver::RR_Driver(RR_NavigationData_t *data):receiver(), motors(), speedometer()
 {
+	navigationdata=data;
 }
 
 void RR_Driver::Enable(void)
@@ -26,7 +27,7 @@ void RR_Driver::driveManual(void)
 	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
 
 	int turnAngle=map(receiver.getSignal(AILE),1110,1920,-180,180);
-	if(DBUG)
+	if(0)
 	{
 		Serial.print(F("Mapped Throttle:  "));
 		Serial.print(throttle_sig); Serial.print(F("  "));
@@ -40,7 +41,7 @@ void RR_Driver::driveManual(void)
 	{
 		rightSpeed=nominalSpeed;
 		leftSpeed=(nominalSpeed*(1-(float)turnAngle/90));
-		if(DBUG)
+		if(0)
 			{
 				Serial.print(F("Mapped leftspeed:  "));
 				Serial.print(nominalSpeed); Serial.print(F("  "));
@@ -53,7 +54,7 @@ void RR_Driver::driveManual(void)
 	{
 		leftSpeed=nominalSpeed;
 		rightSpeed=(nominalSpeed*(1+(float)turnAngle/90));
-		if(DBUG)
+		if(0)
 			{
 				Serial.print(F("Mapped rightspeed:  "));
 				Serial.print(nominalSpeed); Serial.print(F("  "));
@@ -70,10 +71,12 @@ void RR_Driver::driveManual(void)
 
 	motors.setM1Speed(leftSpeed);
 	motors.setM2Speed(rightSpeed);
+	navigationdata->leftMotorSpeed=leftSpeed;
+	navigationdata->rightMotorSpeed=rightSpeed;
 
 }
 
-void RR_Driver::driveAutonomous(RR_NavigationData_t &navigationdata, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)
+void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)
 {
 	Situation_t Situation;
 	isObstacled(imudata, Situation);

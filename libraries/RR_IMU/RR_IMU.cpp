@@ -46,9 +46,9 @@ void RR_IMU::updateIMU(void)
 	dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
 	imuData->fused.roll=orientation.roll;
 	imuData->fused.pitch=orientation.pitch;
-	imuData->fused.heading=orientation.heading;
+	imuData->fused.heading=-orientation.heading;
 
-	if(DBUG)
+	if(0)
 	{
 		/* 'orientation' should have valid .roll and .pitch fields */
 		Serial.print(F("Orientation: "));
@@ -56,6 +56,13 @@ void RR_IMU::updateIMU(void)
 		Serial.print(F(" "));
 		Serial.print(orientation.pitch);
 		Serial.print(F(" "));
+		Serial.print(orientation.heading);
+		Serial.println(F(""));
+	}
+	if(DBUG)
+	{
+		/* 'orientation' should have valid .roll and .pitch fields */
+		Serial.print(F("Heading: "));
 		Serial.print(orientation.heading);
 		Serial.println(F(""));
 	}

@@ -36,8 +36,8 @@ typedef struct RR_TelemetryIncomingMessage_t
     struct Joystick_t{
 
         struct Pad_t{
-			int8_t Vertical, Horizontal;
-        }Pad_A, Pad_B;
+			int16_t X_Axis, Y_Axis;
+        }Pad_Left, Pad_Right;
     }Joystick;
 	
 }RR_TelemetryIncomingMessage_t;
@@ -46,8 +46,8 @@ typedef struct RR_TelemetryIncomingMessage_t
 struct RR_LoggerData_t
 {
 	struct GPSData_t{
-		float	Longitude;	char *Lon;
-		float	Latitude;	char *Lat;
+		float	Longitude;	char Lon;
+		float	Latitude;	char Lat;
 		bool		fix;
 		int16_t		Bearing;
 		uint16_t	DistanceToTarget;
@@ -81,13 +81,15 @@ struct RR_AltimeterData_t
 //Navigation Data
 struct RR_NavigationData_t
 {
+	DriveMode_t driveMode;
+	int16_t leftMotorSpeed, rightMotorSpeed;
 };
 
 //GPS DATA
 struct RR_GPSData_t
 {
-	float	Longitude;	char *Lon;
-	float	Latitude;	char *Lat;
+	float	Longitude;	char Lon;
+	float	Latitude;	char Lat;
 	float	LatitudeRadian, LongitudeRadian;
 	float	LatitudeRadianTarget, LongitudeRadianTarget;
 	bool		fix;

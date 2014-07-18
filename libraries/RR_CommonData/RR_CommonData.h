@@ -28,7 +28,8 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	uint16_t DistanceToTarget;
 	int8_t Heading;
 	int16_t	Bearing;
-	uint16_t Altitude;	
+	uint16_t Altitude;
+
 }RR_TelemetryOutgoingMessage_t;
 
 typedef struct RR_TelemetryIncomingMessage_t
@@ -40,6 +41,7 @@ typedef struct RR_TelemetryIncomingMessage_t
         }Pad_Left, Pad_Right;
     }Joystick;
 	
+//	uint8_t	driveMode;
 }RR_TelemetryIncomingMessage_t;
 
 //Logger Data

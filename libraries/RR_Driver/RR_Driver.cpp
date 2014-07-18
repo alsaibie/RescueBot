@@ -76,6 +76,11 @@ void RR_Driver::driveManual(void)
 
 }
 
+void RR_Driver::driveManual(joystick_t data){
+	Serial.print("Joystick Pad: ");
+	Serial.println(data.Pad_Left.X_Axis);
+}
+
 void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)
 {
 	Situation_t Situation;

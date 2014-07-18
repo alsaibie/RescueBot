@@ -5,11 +5,17 @@
 #include <RR_CommonData\RR_CommonData.h>
 #include <RR_CommonDefines\RR_CommonDefines.h>
 
+
+typedef struct joystick_t : RR_TelemetryIncomingMessage_t::Joystick_t{
+
+};
+
 class RR_Driver
 {
 public:
 	RR_Driver(RR_NavigationData_t *data);
 	void driveManual(void);
+	void driveManual(joystick_t data);
 	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
 	void Enable(void);
 	void Stop(void);

@@ -39,7 +39,7 @@
 #define F(str) str
 
 //-------------OPTIONS------------
-DriveMode_t driveMode=MANUAL;
+uint8_t driveMode=MANUAL_3CH;
 StartMode_t startMode=NAVIGATING;
 //---------------------------------
 
@@ -286,7 +286,7 @@ static void vIMUTask(void *pvParameters){
 			case NAVIGATING:
 				if(!taskOn){
 					taskOn=true;
-					SamplingTime= 500L;
+					SamplingTime= 100L;
 					imu.initIMU();
 				}
 				break;
@@ -301,7 +301,6 @@ static void vIMUTask(void *pvParameters){
 			//No need to take IMUSephore since it won't be updated anywhere else but this thread. Is this safe?
 			TelemetryOutgoingData.Heading=IMUData.fused.heading;
 			xSemaphoreGive(TelemetryMutex);
-
 			//Update Relevant Logger Data
 			xSemaphoreTake(LoggerMutex, portMAX_DELAY);
 			//LoggerData.... = ...
@@ -400,10 +399,18 @@ static void vDriverTask(void *pvParameters){
 				if(!taskOn){
 						driver.Enable();
 						taskOn=true;
+						SamplingTime=100L;
 				}
 				if(DBUG) {Serial.println("Driver Task");}
-				if(driveMode==MANUAL){
+				if(driveMode==MANUAL_3CH){
 					driver.driveManual();
+				}
+				else if(driveMode==MANUAL_PC){
+					xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
+					joystick_t joystick;
+					memcpy(&joystick,&TelemetryIncomingData.Joystick,sizeof(TelemetryIncomingData.Joystick));
+					driver.driveManual(joystick);
+					xSemaphoreGive(TelemetryMutex);
 				}
 				else if(driveMode==AUTONOMOUS_SIMPLE){
 					//TODO: Figure out an efficient way to take and wait for multiple semaphores. 
@@ -425,13 +432,16 @@ static void vDriverTask(void *pvParameters){
 */
 static void vTelemetryTask(void *pvParameters){
 	// --- Task Options --- //
-	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
+	uint16_t SamplingTime=100L;  //Sampling Time (ms) - Initially set at idle
 	// -------------------- //
+	//TODO: only enable after launched
 	while(1)
 	{
 		//Serial.println("Telemetry Task");
 		xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 		radio.Update();
+		//driveMode=TelemetryIncomingData.driveMode;
+		driveMode=MANUAL_PC;
 		xSemaphoreGive(TelemetryMutex);
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}

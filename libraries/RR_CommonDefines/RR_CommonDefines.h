@@ -14,7 +14,7 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 typedef enum {SLOW, MEDIUM, FAST} Speed_t;
 typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t, StartMode_t;
 typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
-typedef enum {MANUAL, AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED} DriveMode_t;
+typedef enum {AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED,MANUAL_PC, MANUAL_3CH} DriveMode_t;
 typedef enum {ON, OFF} SwitchMode_t; 
 typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 

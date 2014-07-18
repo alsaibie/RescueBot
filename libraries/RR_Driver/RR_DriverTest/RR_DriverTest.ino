@@ -6,7 +6,8 @@
 #include <RR_Driver.h>
 #include <RR_CommonDefines.h>
 
-RR_Driver ScorpioDriver;
+RR_NavigationData_t	navdata;
+RR_Driver ScorpioDriver(&navdata);
 
 void setup()
 {

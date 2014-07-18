@@ -44,7 +44,7 @@ bool RR_Telemetry::decodeMessage(void){
 			return false;
 		}
 		else{	
-		if(DBUG) {Serial.println("Checksum Good :D");}
+		if(0) {Serial.println("Checksum Good :D");}
 		}
 		memcpy(incomingAddress, databufferIncoming, MSG_INPACKETSIZE);
 		return true;
@@ -88,10 +88,6 @@ void RR_Telemetry::Update(void)
 	transmitOutgoingBuffer();
 	if(decodeMessage())
 		{
-			if(DBUG){
-				Serial.print("Joystick: ");
-				Serial.println(telemetryInMessage->Joystick.Pad_Right.Y_Axis);
-			}
 	}
 }
 

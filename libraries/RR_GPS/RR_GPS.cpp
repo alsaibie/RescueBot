@@ -38,14 +38,14 @@ void RR_GPS::Update(void)
 {
 	char c =read();
 
-	if(DBUG)
+	if(0)
 	{if (c) Serial.print(c);}
 
 	// If a sentence is received, we can check the checksum, parse it...
     
 	if (newNMEAreceived()) 
 	{
-		if(DBUG)
+		if(0)
 		{
 			Serial.println("NewNMEA");
 			Serial.println(lastNMEA());   // this also sets the newNMEAreceived() flag to false

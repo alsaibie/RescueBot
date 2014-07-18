@@ -252,6 +252,7 @@ static void vGPSTask(void *pvParameters){
 			LoggerData.GPS.Lat=GPSData.Lat;
 			LoggerData.GPS.Longitude=GPSData.Longitude;
 			LoggerData.GPS.Lon=GPSData.Lon;
+
 			LoggerData.GPS.DistanceToTarget=GPSData.DistanceToTarget;
 			LoggerData.GPS.Bearing=GPSData.Bearing;
 			xSemaphoreGive(LoggerMutex);

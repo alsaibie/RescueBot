@@ -181,6 +181,9 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=5000L;
 				break;
 		}
+		xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
+		TelemetryOutgoingData.LaunchState=mainState;
+		xSemaphoreGive(TelemetryMutex);
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
 }
@@ -196,7 +199,7 @@ static void vGPSTask(void *pvParameters){
 	uint16_t SamplingTime= 2000L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
 	bool taskOn=false;
 	// -------------------- //
-
+	uint16_t latTest=0;
 	while(1)
 	{
 		switch(mainState)
@@ -217,10 +220,11 @@ static void vGPSTask(void *pvParameters){
 		}
 		if(taskOn)
 		{
-			if(0) {Serial.println("GPS Task");}
+			if(DBUG) {Serial.println("GPS Task");}
 			while(!gps.newGPSData){
 				gps.Update();
 			}
+			gps.newGPSData=false;
 			if(gps.fix){
 				gps.getData();
 				xSemaphoreGive(GPSSemaphore);
@@ -230,6 +234,7 @@ static void vGPSTask(void *pvParameters){
 				xSemaphoreGive(GPSSemaphore);
 			}		
 			//Update Relevant Telemetry Data
+
 			if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
 			memcpy(&TelemetryOutgoingData.Date, &GPSData.Date, sizeof(GPSData.Date));
 			memcpy(&TelemetryOutgoingData.Time, &GPSData.Time, sizeof(GPSData.Time));

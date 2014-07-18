@@ -50,12 +50,12 @@ static void vGPSTask(void *pvParameters)
 		//Update
 			gps.getData();
 			Serial.println(gpsData.Time.Seconds);
-		xSemaphoreGive(gpsDataMutex);
+			xSemaphoreGive(gpsDataMutex);
 		}
 		else
 		{
-			if(DBUG)
-				Serial.println("NoFix");
+			//if(DBUG)
+				//Serial.println("NoFix");
 		}
 
 	}

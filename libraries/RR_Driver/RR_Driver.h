@@ -1,10 +1,9 @@
 #pragma once
-#include <RR_Motor\RR_Motor.h>
-#include <RR_Encoder\RR_Encoder.h>
-#include <RR_Receiver\RR_Receiver.h>
-#include <RR_CommonData\RR_CommonData.h>
-#include <RR_CommonDefines\RR_CommonDefines.h>
-
+#include "../RR_Motor/RR_Motor.h"
+#include "../RR_Receiver/RR_Receiver.h"
+#include "../RR_Encoder/RR_Encoder.h"
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../RR_CommonData/RR_CommonData.h"
 
 typedef struct joystick_t : RR_TelemetryIncomingMessage_t::Joystick_t{
 

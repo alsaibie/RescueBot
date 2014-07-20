@@ -1,8 +1,8 @@
 #pragma once
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
-#include <Adafruit_Sensor\Adafruit_Sensor.h>
-#include <Adafruit_BMP085_Unified\Adafruit_BMP085_U.h>
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../RR_CommonData/RR_CommonData.h"
+#include "../Adafruit_Sensor/Adafruit_Sensor.h"
+#include "../Adafruit_BMP085_Unified/Adafruit_BMP085_U.h"
 #include <Arduino.h>
 
 

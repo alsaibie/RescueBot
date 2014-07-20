@@ -3,7 +3,6 @@
 /*
 Common Macros for hardware pins, constants, coordinates, communication rates.
 */
-
 #pragma once
 #include <string.h>
 #include <ctype.h>
@@ -83,6 +82,3 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define AILE_RX_PIN 4
 #define ELEV_RX_PIN 5
 #define RUDD_RX_PIN 6
-
-
-

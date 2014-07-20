@@ -1,5 +1,5 @@
 #pragma once
-#include "RR_CommonDefines.h"
+#include "../RR_CommonDefines/RR_CommonDefines.h"
 #include <Arduino.h>
 
 typedef enum {THRO = 0, AILE = 1, ELEV = 2, RUDD = 3} CHANNEL;

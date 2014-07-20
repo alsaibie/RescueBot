@@ -20,11 +20,11 @@
 #else
  #include "WProgram.h"
 #endif
-#include <Adafruit_Sensor\Adafruit_Sensor.h>
-#include <Adafruit_LSM303DLHC\Adafruit_LSM303_U.h>
-#include <Adafruit_BMP085_Unified\Adafruit_BMP085_U.h>
-#include <Adafruit_L3GD20_U\Adafruit_L3GD20_U.h>
-#include <Wire\Wire.h>
+#include "../Adafruit_Sensor/Adafruit_Sensor.h"
+#include "../Adafruit_LSM303DLHC\Adafruit_LSM303_U.h"
+#include "../Adafruit_BMP085_Unified/Adafruit_BMP085_U.h"
+#include "../Adafruit_L3GD20_U/Adafruit_L3GD20_U.h"
+#include "../Wire/Wire.h"
 
 /** Sensor axis */
 typedef enum

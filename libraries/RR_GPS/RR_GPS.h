@@ -4,9 +4,10 @@
 * GPS Location format of the Module DDMM.MMMM (Dec Min)
 * GPS Time format hhmmss.sss
 */
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
-#include <Adafruit_GPS\Adafruit_GPS.h>
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../RR_CommonData/RR_CommonData.h"
+#include "../Adafruit_GPS/Adafruit_GPS.h"
+
 #include <math.h>
 #include <Arduino.h>
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "RR_CommonDefines.h"
 #include <Arduino.h>
-#include <Encoder\Encoder.h>
+#include "../Encoder/Encoder.h"
 class RR_Encoder
 {
   public:  

@@ -5,8 +5,7 @@
 */
 
 #pragma once
-#include <RR_CommonDefines/RR_CommonDefines.h>
-
+#include "../RR_CommonDefines/RR_CommonDefines.h"
 //Telemetry Data
 typedef struct RR_TelemetryOutgoingMessage_t
 {

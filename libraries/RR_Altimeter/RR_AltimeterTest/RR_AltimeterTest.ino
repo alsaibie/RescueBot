@@ -3,7 +3,8 @@
 #include <Wire.h>
 #include <RR_Altimeter.h>
 
-RR_Altimeter altimeter;
+RR_AltimeterData_t altimeterData;
+RR_Altimeter altimeter(&altimeterData);
 void setup()
 {  
 	altimeter.initAltimeter();

@@ -3,7 +3,7 @@
  
    This example code is in the public domain.
 */
-//
+
 // Teensy 2.0 has the LED on pin 11
 // Teensy++ 2.0 has the LED on pin 6
 // Teensy 3.0 has the LED on pin 13

@@ -1,6 +1,6 @@
 #pragma once
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../RR_CommonData/RR_CommonData.h"
 #include <Arduino.h>
 #include <math.h>
 #include <stdio.h>

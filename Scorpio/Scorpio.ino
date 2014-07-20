@@ -30,9 +30,13 @@
 #include <FreeRTOS_ARM.h>
 #include <basic_io_arm.h>
 #include <Wire.h>
-#include <FreeRTOS_ARM\utility\task.h>
-#include <FreeRTOS_ARM\utility\semphr.h>
-#include <FreeRTOS_ARM\utility\StackMacros.h>
+//Must include libraries not directly in "libraries" folder explicitly to compile with arduino ide
+#include "..\FreeRTOS_ARM\utility\task.h"
+#include "..\FreeRTOS_ARM\utility\semphr.h"
+#include "..\FreeRTOS_ARM\utility\StackMacros.h"
+
+
+
 
 //ARM doesn't need this. Undef F.
 #undef F

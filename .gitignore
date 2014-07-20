@@ -8,3 +8,6 @@ Visual Micro/
 *.idb
 *.unsuccessfulbuild
 *.lastbuildstate
+*.user
+*.log
+*.pdb

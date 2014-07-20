@@ -18,7 +18,6 @@
  #include "WProgram.h"
 #endif
 
-#include <Wire/Wire.h>
 #include <limits.h>
 
 #include "Adafruit_LSM303_U.h"

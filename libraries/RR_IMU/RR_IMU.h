@@ -8,14 +8,14 @@
   Written by Ali AlSaibie
  ***************************************************************************/
 #pragma once
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
-#include <Adafruit_Sensor\Adafruit_Sensor.h>
-#include <Adafruit_LSM303DLHC\Adafruit_LSM303_U.h>
-#include <Adafruit_10DOF\Adafruit_10DOF.h>
-#include <Adafruit_L3GD20_U\Adafruit_L3GD20_U.h>
-#include <Arduino.h>
 
+#include <Arduino.h>
+#include "../RR_CommonData/RR_CommonData.h"
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../Adafruit_10DOF\Adafruit_10DOF.h"
+#include "../Adafruit_L3GD20_U/Adafruit_L3GD20_U.h"
+#include "../Adafruit_LSM303DLHC/Adafruit_LSM303_U.h"
+#include "../Adafruit_Sensor/Adafruit_Sensor.h"
 
 class RR_IMU
 {

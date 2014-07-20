@@ -1,7 +1,6 @@
 #pragma once
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
-
+#include "../RR_CommonDefines/RR_CommonDefines.h"
+#include "../RR_CommonData/RR_CommonData.h"
 //define message types here
 /* GPS Data Format 
 * $GPS,mcutime,Fix,GPSTIME,Latitude,Lat,Longitude,Lon,DistanceToTarget,Bearing,#

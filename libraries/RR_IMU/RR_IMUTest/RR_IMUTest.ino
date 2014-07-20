@@ -1,11 +1,12 @@
+#include <RR_CommonDefines.h>
+#include <RR_CommonData.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_L3GD20_U.h>
 #include <Adafruit_10DOF.h>
 #include <Adafruit_LSM303_U.h>
 #include <RR_IMU.h>
-#include <RR_CommonDefines\RR_CommonDefines.h>
-#include <RR_CommonData\RR_CommonData.h>
+
 
 RR_IMUData_t imudata;
 RR_IMU imu(&imudata);

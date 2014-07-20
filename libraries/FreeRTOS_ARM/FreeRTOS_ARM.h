@@ -12,11 +12,11 @@
 /** FreeRTOS_ARM version YYYYMMDD */
 #define FREE_RTOS_ARM_VERSION 20130713
 //------------------------------------------------------------------------------
-#include "utility/FreeRTOS.h"
-#include "utility/task.h"
-#include "utility/queue.h"
-#include "utility/semphr.h"
-#include "utility/portmacro.h"
-//#include "utility/cmsis_os.h"
+#include "../FreeRTOS_ARM/utility/FreeRTOS.h"
+#include "../FreeRTOS_ARM/utility/task.h"
+#include "../FreeRTOS_ARM/utility/queue.h"
+#include "../FreeRTOS_ARM/utility/semphr.h"
+#include "../FreeRTOS_ARM/utility/portmacro.h"
+//#include "../FreeRTOS_ARM/utility/cmsis_os.h"
 #endif  // __arm__
 #endif  // FreeRTOS_ARM_h

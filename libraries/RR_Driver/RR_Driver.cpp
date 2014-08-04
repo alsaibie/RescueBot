@@ -77,8 +77,12 @@ void RR_Driver::driveManual(void)
 }
 
 void RR_Driver::driveManual(joystick_t data){
-	Serial.print("Joystick Pad: ");
-	Serial.println(data.Pad_Left.X_Axis);
+	leftSpeed=map(data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
+	rightSpeed=map(data.Pad_Right.Y_Axis,-32768, 32767,-400,400);
+	motors.setM1Speed(leftSpeed);
+	motors.setM2Speed(rightSpeed);
+	navigationdata->leftMotorSpeed=leftSpeed;
+	navigationdata->rightMotorSpeed=rightSpeed;
 }
 
 void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)

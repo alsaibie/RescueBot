@@ -16,7 +16,8 @@
 #include "../Adafruit_L3GD20_U/Adafruit_L3GD20_U.h"
 #include "../Adafruit_LSM303DLHC/Adafruit_LSM303_U.h"
 #include "../Adafruit_Sensor/Adafruit_Sensor.h"
-
+#include "../ahrs/ahrs.h"
+#include "../Filter/Filter.h"
 class RR_IMU
 {
   public:  
@@ -31,19 +32,25 @@ class RR_IMU
 	
 	//RescueBot Methods
 	void initIMU(void);
+	void initAHRS(void);
 	void updateIMU(void);
+	void updateIMUahrs(void);
 	void DisplayIMUDetails(void);
 
 	//Handlers
-	sensors_event_t accel_event;
+	sensors_event_t accel_event, accelFil_event;
     sensors_event_t mag_event;
     sensors_event_t gyro_event;
     sensors_vec_t   orientation;
+	imu::Vector<3> accVec;
+	imu::Vector<3> magVec;
+	imu::Vector<3> gyrVec;
 
 	//Destructor
 	~RR_IMU(void);
   private:
 	  RR_IMUData_t *imuData;
+	  Filter imuFilterX,imuFilterY,imuFilterZ;
 
 };
 

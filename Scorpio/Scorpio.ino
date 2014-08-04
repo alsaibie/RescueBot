@@ -8,6 +8,12 @@
 /* for some reason I have to include all headers here! TODO: Fix This. Only Include RR_... Headers.
 *
 */
+#include <Filter.h>
+#include <vector.h>
+#include <quaternion.h>
+#include <matrix.h>
+#include <imumaths.h>
+#include <ahrs.h>
 #include <RR_CommonData.h>
 #include <Encoder.h>
 #include <RR_IMU.h>
@@ -69,7 +75,7 @@ RR_GPS			gps(&GPSData);
 RR_MOSFET		nichrome;
 RR_SDCard		sdcard(&LoggerData); 
 RR_Telemetry	radio(&TelemetryOutgoingData,&TelemetryIncomingData);
-RR_IMU			imu(&IMUData);
+RR_IMU			imuS(&IMUData);
 
 
 //List of Task Functions - Creations / Definitions Below
@@ -290,15 +296,16 @@ static void vIMUTask(void *pvParameters){
 			case NAVIGATING:
 				if(!taskOn){
 					taskOn=true;
-					SamplingTime= 100L;
-					imu.initIMU();
+					SamplingTime= 5L;
+					imuS.initIMU();
 				}
 				break;
 		}
 
 		if(taskOn){
 			if(0) {Serial.println("IMU Task");}
-			imu.updateIMU();
+			imuS.updateIMU();
+			//imuS.updateIMUahrs();
 			xSemaphoreGive(IMUSemaphore);
 			//Update Relevant Telemetry Data
 			xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
@@ -405,10 +412,11 @@ static void vDriverTask(void *pvParameters){
 						taskOn=true;
 						SamplingTime=100L;
 				}
-				if(DBUG) {Serial.println("Driver Task");}
+				//if(DBUG) {Serial.println("Driver Task");}
 				if(driveMode==MANUAL_3CH){
 					driver.driveManual();
 				}
+
 				else if(driveMode==MANUAL_PC){
 					xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 					joystick_t joystick;
@@ -445,7 +453,7 @@ static void vTelemetryTask(void *pvParameters){
 		xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 		radio.Update();
 		//driveMode=TelemetryIncomingData.driveMode;
-		driveMode=MANUAL_PC;
+		//driveMode=MANUAL_PC;
 		xSemaphoreGive(TelemetryMutex);
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}

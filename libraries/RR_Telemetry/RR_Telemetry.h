@@ -16,7 +16,7 @@ class RR_Telemetry
 	 RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_TelemetryIncomingMessage_t *myIncomingdata);
 	 void sendShortMessage(char *str); //To send direct strings for debugging
 	 void Update(void);
-	 void printMsg(RR_TelemetryOutgoingMessage_t* myOutgoingdata);
+	 void printMsg(void);
 	 //Methods to receive messages
 	~RR_Telemetry(void);
 
@@ -27,9 +27,9 @@ class RR_Telemetry
 	  bool decodeMessage(void);
 	  RR_TelemetryOutgoingMessage_t *telemetryOutMessage;
 	  RR_TelemetryIncomingMessage_t *telemetryInMessage;
-	  uint8_t *incomingAddress;
-	  uint8_t databufferOutgoing[MSG_OUTPACKETSIZE+10];
-	  uint8_t databufferIncoming[MSG_INPACKETSIZE+10];
+	  byte *incomingAddress;
+	  uint8_t databufferOutgoing[MSG_OUTPACKETSIZE+50];
+	  uint8_t databufferIncoming[MSG_INPACKETSIZE+50];
 };
 
 

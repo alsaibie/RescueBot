@@ -7,8 +7,8 @@ RR_Telemetry::RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_Tel
 {
 	telemetryOutMessage=myOutgoingdata;
 	telemetryInMessage=myIncomingdata;
-	incomingAddress=(byte*)telemetryInMessage;
-	telemetryInMessage->Joystick.Pad_Left.Y_Axis=0;
+	incomingAddress=(uint8_t*)telemetryInMessage;
+	//incomingAddress=*telemetryInMessage;
 	Serial3.begin(56700);
 }
 
@@ -44,12 +44,15 @@ bool RR_Telemetry::decodeMessage(void){
 			return false;
 		}
 		else{	
-		if(0) {Serial.println("Checksum Good :D");}
-		}
-		memcpy(incomingAddress, databufferIncoming, MSG_INPACKETSIZE);
-		return true;
+		if(1) {Serial.println("Checksum Good :D");}
+		
+		memcpy(incomingAddress, databufferIncoming,MSG_INPACKETSIZE);
 		if(DBUG){
+			printMsg();
 		}
+		return true;
+		}
+
 
 	}
 
@@ -93,13 +96,12 @@ void RR_Telemetry::Update(void)
 
 
 
-void RR_Telemetry::printMsg(RR_TelemetryOutgoingMessage_t* myOutgoingdata)
+void RR_Telemetry::printMsg(void)
 {
-	/*
-	Serial.println(myOutgoingdata->message_id);
-	Serial.println(myOutgoingdata->sender);
-	Serial.println(myOutgoingdata->message);
-	*/
+	Serial.print("Joystick Left X: ");
+	Serial.println(telemetryInMessage->Joystick.Pad_Left.X_Axis);
+	Serial.print("Joystick Left Y: ");
+	Serial.println(telemetryInMessage->Joystick.Pad_Right.X_Axis);
 }
 
 RR_Telemetry::~RR_Telemetry(void)

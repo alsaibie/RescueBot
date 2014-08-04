@@ -25,7 +25,7 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	float Latitude;
 	float Longitude;
 	uint16_t DistanceToTarget;
-	int8_t Heading;
+	int16_t Heading;
 	int16_t	Bearing;
 	uint16_t Altitude;
 

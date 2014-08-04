@@ -13,7 +13,7 @@ void setup()
 
 void loop()
 {
-	Serial.begin(56700);
+	Serial.begin(115200);
 	radio.Update();
-	delay(200);
+	delay(100);
 }

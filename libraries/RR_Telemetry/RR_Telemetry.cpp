@@ -7,50 +7,58 @@ RR_Telemetry::RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_Tel
 {
 	telemetryOutMessage=myOutgoingdata;
 	telemetryInMessage=myIncomingdata;
-	incomingAddress=(uint8_t*)telemetryInMessage;
-	//incomingAddress=*telemetryInMessage;
+	incomingAddress=(byte*)telemetryInMessage;
+	//incomingAddress=(uint8_t)&(*telemetryInMessage);
+	sizeIncoming=sizeof(*telemetryInMessage);
+	databufferIncoming = (byte*) malloc(sizeIncoming);
 	Serial3.begin(56700);
 }
 
 
 bool RR_Telemetry::decodeMessage(void){
+	//if(DBUG) {Serial.println("Test");}
 	if(Serial3.available() >= 3){
+							
 		while(Serial3.read() != 0x06){
 			if(Serial3.available() < 3)
 				return false;
 		}
+		
 		if(Serial3.read() != 0x85){
 			if(DBUG) {Serial.println("Header Doesn't Match");}
 			return false;
 		}
-		if(Serial3.read()!=MSG_INPACKETSIZE) {
+		if(Serial3.read()!=sizeIncoming) {
 			if(DBUG) {Serial.println("Message Received Size Don't Match");}
 			return false;
 			}	
 		int receive_array_ind=0;
-		while (Serial3.available() && receive_array_ind<=MSG_INPACKETSIZE){
+		while (Serial3.available() && receive_array_ind<=sizeIncoming){
 			databufferIncoming[receive_array_ind++] = Serial3.read();
 		}
-		if((receive_array_ind-1)!=MSG_INPACKETSIZE) {
+		if((receive_array_ind-1)!=sizeIncoming) {
 			if(DBUG) {Serial.println("Message Buffer Not Same Size");}
 			return false;
 			}
-		int inCS=MSG_INPACKETSIZE;
-		for (int i=0; i<MSG_INPACKETSIZE; i++){
+		int inCS=sizeIncoming;
+		for (int i=0; i<sizeIncoming; i++){
 			inCS^=databufferIncoming[i];
 		}
-		if(inCS != databufferIncoming[receive_array_ind-1]){
+		if(inCS == databufferIncoming[receive_array_ind-1]){
+			if(1) {Serial.println("Checksum Good :D");}
+		
+			//memcpy(incomingAddress, databufferIncoming,MSG_INPACKETSIZE);
+			Serial.println(databufferIncoming[0]);
+			memcpy(incomingAddress, databufferIncoming, sizeIncoming);
+			receive_array_ind=0;
+			if(DBUG){
+				printMsg();
+			}
+		return true;
+		}
+		else{
 			if(DBUG) {Serial.println("Checksum bad :(");}
 			return false;
-		}
-		else{	
-		if(1) {Serial.println("Checksum Good :D");}
-		
-		memcpy(incomingAddress, databufferIncoming,MSG_INPACKETSIZE);
-		if(DBUG){
-			printMsg();
-		}
-		return true;
 		}
 
 
@@ -98,10 +106,17 @@ void RR_Telemetry::Update(void)
 
 void RR_Telemetry::printMsg(void)
 {
+
 	Serial.print("Joystick Left X: ");
 	Serial.println(telemetryInMessage->Joystick.Pad_Left.X_Axis);
 	Serial.print("Joystick Left Y: ");
+	Serial.println(telemetryInMessage->Joystick.Pad_Left.Y_Axis);
+	Serial.print("Joystick Right X: ");
 	Serial.println(telemetryInMessage->Joystick.Pad_Right.X_Axis);
+	Serial.print("Joystick Right Y: ");
+	Serial.println(telemetryInMessage->Joystick.Pad_Right.Y_Axis);
+	
+	
 }
 
 RR_Telemetry::~RR_Telemetry(void)

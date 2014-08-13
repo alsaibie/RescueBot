@@ -37,23 +37,19 @@ void RR_IMU::updateIMU(void)
 {
 	int avgcount = 20;
 	float tempavg = 0;
-	//for(int i=0; i<avgcount; i++)
-	//{
+
 		accel.getEvent(&accel_event);
 		accelFil_event.acceleration.x=imuFilterX.step(accel_event.acceleration.x);
 		accelFil_event.acceleration.y=imuFilterY.step(accel_event.acceleration.y);
 		accelFil_event.acceleration.z=imuFilterZ.step(accel_event.acceleration.z);
 		mag.getEvent(&mag_event);
 		gyro.getEvent(&gyro_event);
-		dof.fusionGetOrientation(&accelFil_event, &mag_event, &orientation);
+		//dof.fusionGetOrientation(&accelFil_event, &mag_event, &orientation);
+		//dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
 		//dof.accelGetOrientation(&accelFil_event,&orientation);
 		//dof.magTiltCompensation(SENSOR_AXIS_Z, &mag_event, &accelFil_event);
-		//dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation);
-	//	tempavg += (-orientation.heading);
-		//delay(2);
-	//}
-	
-	//imuData->fused.heading=tempavg/avgcount;
+		dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation);
+
 	imuData->fused.heading=-orientation.heading;
 	imuData->fused.roll=orientation.roll;
 	imuData->fused.pitch=orientation.pitch;
@@ -91,6 +87,12 @@ void RR_IMU::updateIMU(void)
 		Serial.print(F("Heading: "));
 		Serial.print(orientation.heading);
 		Serial.println(F(""));
+	}
+		if(0)
+	{
+		Serial.print("X: "); Serial.print(accel_event.acceleration.x); Serial.print("  ");
+		Serial.print("Y: "); Serial.print(accel_event.acceleration.y); Serial.print("  ");
+		Serial.print("Z: "); Serial.print(accel_event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
 	}
 	if(0){
 		Serial.print(F("Acc   "));

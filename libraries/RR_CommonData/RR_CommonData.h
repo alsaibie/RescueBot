@@ -34,13 +34,10 @@ typedef struct RR_TelemetryOutgoingMessage_t
 typedef struct RR_TelemetryIncomingMessage_t
 {
     struct Joystick_t{
-
         struct Pad_t{
 			int16_t X_Axis, Y_Axis;
         }Pad_Left, Pad_Right;
     }Joystick;
-	
-//	uint8_t	driveMode;
 }RR_TelemetryIncomingMessage_t;
 
 //Logger Data

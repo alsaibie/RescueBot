@@ -49,7 +49,7 @@
 #define F(str) str
 
 //-------------OPTIONS------------
-uint8_t driveMode=MANUAL_3CH;
+uint8_t driveMode=MANUAL_PC;
 StartMode_t startMode=NAVIGATING;
 //---------------------------------
 

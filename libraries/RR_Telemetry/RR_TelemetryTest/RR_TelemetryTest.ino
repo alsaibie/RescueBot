@@ -9,11 +9,12 @@ void setup()
 	outgoingMessage.Date.Year=2014;
 	outgoingMessage.Date.Month=06;
 	outgoingMessage.Date.Day=29;
+//	incomingMessages.Joystick.Pad_Right.X_Axis=125;
 }
 
 void loop()
 {
 	Serial.begin(115200);
 	radio.Update();
-	delay(100);
+	delay(50);
 }

@@ -237,7 +237,7 @@ bool Adafruit_10DOF::magTiltCompensation(sensors_axis_t axis, sensors_event_t *m
 /**************************************************************************/
 bool Adafruit_10DOF::magGetOrientation(sensors_axis_t axis, sensors_event_t *event, sensors_vec_t *orientation)
 {
-  /* Make sure the input is valid, not null, etc. */
+   /* Make sure the input is valid, not null, etc. */
   if (event == NULL) return false;
   if (orientation == NULL) return false;
 
@@ -262,7 +262,6 @@ bool Adafruit_10DOF::magGetOrientation(sensors_axis_t axis, sensors_event_t *eve
       /* "heading" is the angle between the 'X axis' and magnetic north on the horizontal plane (Oxy) */
       /* heading = atan(My / Mx)                                                                      */
       orientation->heading = (float)atan2(event->magnetic.y, event->magnetic.x) * 180 / PI;
-	  if(event->magnetic.x<0) orientation->heading+=180;
       break;
 
     default:

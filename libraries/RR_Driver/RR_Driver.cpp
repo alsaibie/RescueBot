@@ -77,8 +77,8 @@ void RR_Driver::driveManual(void)
 }
 
 void RR_Driver::driveManual(joystick_t data){
-	leftSpeed=map(data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
-	rightSpeed=map(data.Pad_Right.Y_Axis,-32768, 32767,-400,400);
+	leftSpeed=-map(data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
+	rightSpeed=-map(data.Pad_Right.Y_Axis,-32768, 32767,-400,400);
 	motors.setM1Speed(leftSpeed);
 	motors.setM2Speed(rightSpeed);
 	navigationdata->leftMotorSpeed=leftSpeed;

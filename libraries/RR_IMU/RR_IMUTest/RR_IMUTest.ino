@@ -9,23 +9,24 @@
 
 
 RR_IMUData_t imudata;
-RR_IMU imu(&imudata);
+RR_IMU imuS(&imudata);
 
 void setup(void)
 {
   Serial.begin(115200);
+  delay(2000);
   Serial.println(F("RR IMU Tester")); Serial.println("");
   
   /* Initialise the IMU */
-  imu.initIMU();
+  imuS.initIMU();
   delay(3000);
   /* Display some basic information on this IMU */
-  imu.DisplayIMUDetails();
-  delay(5000);
+  imuS.DisplayIMUDetails();
+  delay(1000);
 }
 
 void loop(void)
 {
-  imu.updateIMU();
+  imuS.updateIMU();
   delay(200);
 }

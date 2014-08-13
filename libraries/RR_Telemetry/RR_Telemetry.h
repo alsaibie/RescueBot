@@ -27,9 +27,12 @@ class RR_Telemetry
 	  bool decodeMessage(void);
 	  RR_TelemetryOutgoingMessage_t *telemetryOutMessage;
 	  RR_TelemetryIncomingMessage_t *telemetryInMessage;
-	  byte *incomingAddress;
+	  uint8_t *incomingAddress;
 	  uint8_t databufferOutgoing[MSG_OUTPACKETSIZE+50];
-	  uint8_t databufferIncoming[MSG_INPACKETSIZE+50];
+	  //uint8_t databufferIncoming[MSG_INPACKETSIZE+50];
+	  size_t  sizeIncoming;
+	  uint8_t *databufferIncoming;
+
 };
 
 

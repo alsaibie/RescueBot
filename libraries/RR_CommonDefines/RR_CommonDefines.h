@@ -17,7 +17,8 @@ typedef enum {AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED,MANUAL_PC, MANUAL_3CH} Driv
 typedef enum {ON, OFF} SwitchMode_t; 
 typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 
-#define LAUNCH_THRESHOLD 100
+#define LAUNCH_THRESHOLD 50
+#define LANDING_CHECK_THRESHOLD 10 //meters
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
 
@@ -44,7 +45,9 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 
 //MACRO FUNCTIONS
 
-//MOTOR 
+
+
+//MOTOR
 #define FORWARD 1
 #define BACKWARD 0
 #define M1DIR_PIN 23
@@ -56,9 +59,8 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define MOTOR_D_PIN 17
 #define MOTOR1_PWM_PIN 22
 #define MOTOR2_PWM_PIN 20
-
 //DRIVER
-#define THRESHOLD_ANGLE_LOWER 10
+#define THRESHOLD_ANGLE_LOWER 30
 #define THRESHOLD_ANGLE_UPPER 60
 #define SPEED_MAX 400
 #define SPEED_CRUISE 350

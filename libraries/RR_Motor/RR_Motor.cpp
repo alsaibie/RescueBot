@@ -47,7 +47,7 @@ void RR_Motor::init()
 // Set speed for motor 1, speed is a number betwenn -400 and 400
 void RR_Motor::setM1Speed(int speed)
 {
-  speed=-speed; //Because the wires are flipped
+  //speed=-speed; //Because the wires are flipped
   unsigned char reverse = 0;
   
   if (speed > 400)  // Max PWM dutycycle
@@ -72,7 +72,7 @@ void RR_Motor::setM1Speed(int speed)
 // Set speed for motor 2, speed is a number betwenn -400 and 400
 void RR_Motor::setM2Speed(int speed)
 {
-	speed=-speed; //Because the wires are flipped
+	//speed=-speed; //Because the wires are flipped
   unsigned char reverse = 0;
     
   if (speed > 400)  // Max PWM dutycycle

@@ -51,6 +51,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scorpio", "Scorpio\Scorpio.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IMUCalibrate", "IMUCalibrate\IMUCalibrate.vcxproj", "{B0B0A1B1-C78A-4B78-87E1-2C24EE6CF0E1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeIMU", "FreeIMU\FreeIMU.vcxproj", "{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -157,6 +159,10 @@ Global
 		{B0B0A1B1-C78A-4B78-87E1-2C24EE6CF0E1}.Debug|Win32.Build.0 = Debug|Win32
 		{B0B0A1B1-C78A-4B78-87E1-2C24EE6CF0E1}.Release|Win32.ActiveCfg = Release|Win32
 		{B0B0A1B1-C78A-4B78-87E1-2C24EE6CF0E1}.Release|Win32.Build.0 = Release|Win32
+		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Debug|Win32.Build.0 = Debug|Win32
+		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Release|Win32.ActiveCfg = Release|Win32
+		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -24,12 +24,13 @@ void setup()
   Serial.println("RR_Motor Test");
   md.init();
   md.setM1Speed(400);
+  //md.setM2Speed(400);
 }
 
 void loop()
 {
 	// Accelerate Forward Motor 1 
-
+	/*
   for (int i = 0; i <= 400; i++)
   {
     md.setM1Speed(i);
@@ -113,5 +114,5 @@ void loop()
     }
     delay(20);
   }
-  
+  */
 }

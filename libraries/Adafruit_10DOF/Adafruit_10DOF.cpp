@@ -352,6 +352,9 @@ bool Adafruit_10DOF::fusionGetOrientation(sensors_event_t *accel_event, sensors_
   orientation->roll = orientation->roll * 180 / PI_F;
   orientation->pitch = orientation->pitch * 180 / PI_F;
   orientation->heading = orientation->heading * 180 / PI_F;
+  if(orientation->heading<0){
+	  orientation->heading=(orientation->heading + 360);
+  }
 
   return true;
 }

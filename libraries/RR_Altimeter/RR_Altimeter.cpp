@@ -6,25 +6,33 @@ RR_Altimeter::RR_Altimeter(RR_AltimeterData_t *data): bmp(18001)
 	altimeterData->baseAltitude=0;
 	altimeterData->maxAltitude=0;
 	checkPeakInd=0;
+	checkLandingInd=0;
+	checkLandingcounter=0;
+	if(!bmp.begin())
+	  {
+		/* There was a problem detecting the BMP180 ... check your connections */
+		Serial.println("Ooops, no BMP180 detected ... Check your wiring!");
+		while(1);
+	  }
 }
 
 void RR_Altimeter::initAltimeter(void)
 {
-  if(!bmp.begin())
-  {
-    /* There was a problem detecting the BMP180 ... check your connections */
-    Serial.println("Ooops, no BMP180 detected ... Check your wiring!");
-    while(1);
-  }
+
 
   //TODO: take some readings for some time and record base altitude.
   int i;
-  for (i=0; i<10; i++){
+  uint8_t samplesBaseAlt=10;
+  for (i=0; i<samplesBaseAlt; i++){
 	  updateAltimeter();
 	  delay(500);
 	  altimeterData->baseAltitude+=altimeterData->altitude;
   }
-  altimeterData->baseAltitude*=1/i;
+  altimeterData->baseAltitude=altimeterData->baseAltitude/samplesBaseAlt;
+  if(DBUG) {
+	  Serial.print("Base Altitude: ");
+	  Serial.println(altimeterData->baseAltitude);
+  }
 }
 
 void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t SamplingTime)
@@ -42,7 +50,10 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 			// Do Nothing
 			break;
 		case checkLAUNCH:
-			if((altimeterData->altitude)>(altimeterData->baseAltitude+LAUNCH_THRESHOLD)? altimeterData->Launched=true : NULL);
+			if((altimeterData->altitude)>(altimeterData->baseAltitude+LAUNCH_THRESHOLD)){
+				altimeterData->Launched=true;
+				if(DBUG) {Serial.println("Launched");}
+			}
 			break;
 		case checkPEAK:
 			// If read altitude is greater than recorder max altitude, it would be the max
@@ -58,10 +69,38 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 			if(checkPeakInd==10)
 			{
 				altimeterData->Peaked=true;
+				if(DBUG) {Serial.println("Descending");}
+				checkLandingAltitude=altimeterData->altitude;
 			}
 			break;
 		case checkLANDING:
+
 			//Check if altitude doesn't change for 1 minute using the sampling time
+			//Option 1: Check 3 times every 20 seconds, the altitude didn't change more than LANDING_CHECK_THRESHOLD meters
+			checkLandingcounter++;
+						if(0){Serial.print("Landing Counter: ");
+					Serial.println(checkLandingcounter);
+					}
+			if(SamplingTime*checkLandingcounter>2000L){
+				TBUG
+				checkLandingcounter=0;
+				if (abs(altimeterData->altitude-checkLandingAltitude)<LANDING_CHECK_THRESHOLD){
+					checkLandingInd++;
+					if(DBUG){Serial.print("F: ");
+					Serial.println(checkLandingInd);
+					}
+				}
+				else{	
+					checkLandingcounter=0;
+				}
+
+				checkLandingAltitude=altimeterData->altitude;
+
+				if(checkLandingInd>3){
+					altimeterData->Landed=true;
+					if(DBUG) {Serial.println("Landed");}
+					}
+				}
 			break;
 	}
 	if(DBUG)
@@ -69,17 +108,18 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 		if (altimeter_event.pressure)
 		  {
 			/* Display atmospheric pressure in hPa */
-			Serial.print(F("PRESS "));
-			Serial.print(altimeter_event.pressure);
-			Serial.print(F(" hPa, "));
+			//Serial.print(F("PRESS "));
+			//Serial.print(altimeter_event.pressure);
+			//Serial.print(F(" hPa, "));
 			/* Display ambient temperature in C */
-			float temperature;
-			bmp.getTemperature(&temperature);
-			Serial.print(temperature);
-			Serial.print(F(" C, "));
+			//float temperature;
+			//bmp.getTemperature(&temperature);
+			//Serial.print(temperature);
+			//Serial.print(F(" C, "));
 			/* Then convert the atmospheric pressure, SLP and temp to altitude    */
 			/* Update this next line with the current SLP for better results      */
 			float seaLevelPressure = SENSORS_PRESSURE_SEALEVELHPA;
+			Serial.print("Altitude: ");
 			Serial.print(bmp.pressureToAltitude(seaLevelPressure,
 												altimeter_event.pressure,
 												temperature)); 

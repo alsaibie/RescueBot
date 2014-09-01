@@ -21,6 +21,10 @@ static void vGPSTask(void *pvParameters);
 void setup()
 {  
 	Serial.begin(115200);
+	delay(2000);
+	Serial.println(gps.toRadians(TARGET_LAT),4);
+	//while(1);
+	Serial.println("GPS Test");
 	gps.Enable();
 	xTaskCreate(vGPSTask,(signed portCHAR *)"GPS Task", configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &gpsTask);
 	vSemaphoreCreateBinary(gpsDataMutex);
@@ -49,13 +53,16 @@ static void vGPSTask(void *pvParameters)
 		xSemaphoreTake(gpsDataMutex, portMAX_DELAY);
 		//Update
 			gps.getData();
+			Serial.print(gpsData.Time.Hour-4); Serial.print(":");
+			Serial.print(gpsData.Time.Minute); Serial.print(":");
 			Serial.println(gpsData.Time.Seconds);
 			xSemaphoreGive(gpsDataMutex);
 		}
 		else
 		{
-			//if(DBUG)
+			if(DBUG){
 				//Serial.println("NoFix");
+			}
 		}
 
 	}

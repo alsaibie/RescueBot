@@ -6,6 +6,7 @@
 #include <Arduino.h>
 
 
+
 class RR_Altimeter
 {
 	public:  
@@ -26,7 +27,7 @@ class RR_Altimeter
 	~RR_Altimeter(void);
   private:
 	 RR_AltimeterData_t *altimeterData; 
-	 uint8_t checkPeakInd;
+	 uint16_t checkPeakInd, checkLandingInd, checkLandingcounter;
 	 uint32_t checkLandingAltitude;
 };
 

@@ -22,12 +22,14 @@ typedef struct RR_TelemetryOutgoingMessage_t
 
 	uint8_t LaunchState;
 	uint8_t NavigationalState;
+	uint8_t  fix;
 	float Latitude;
 	float Longitude;
+    float targetLatidude, targetLongitude;
 	uint16_t DistanceToTarget;
 	int16_t Heading;
 	int16_t	Bearing;
-	uint16_t Altitude;
+	uint16_t Altitude, baseAltitude, maxAltitude;
 
 }RR_TelemetryOutgoingMessage_t;
 
@@ -38,6 +40,8 @@ typedef struct RR_TelemetryIncomingMessage_t
 			int16_t X_Axis, Y_Axis;
         }Pad_Left, Pad_Right;
     }Joystick;
+	uint8_t StartState;
+    uint8_t DriveMode;
 }RR_TelemetryIncomingMessage_t;
 
 //Logger Data
@@ -64,6 +68,7 @@ struct RR_LoggerData_t
 
 	struct Navigation_t{
 		int16_t speed;
+		int16_t heading;
 	}Navigation;
 };
 
@@ -88,6 +93,7 @@ struct RR_GPSData_t
 {
 	float	Longitude;	char Lon;
 	float	Latitude;	char Lat;
+    float targetLatidude, targetLongitude;
 	float	LatitudeRadian, LongitudeRadian;
 	float	LatitudeRadianTarget, LongitudeRadianTarget;
 	bool		fix;
@@ -133,5 +139,6 @@ struct RR_IMUData_t
 		float pitch, roll, heading;
 	}fused;
 
+	float headingFiltered;
 };
 

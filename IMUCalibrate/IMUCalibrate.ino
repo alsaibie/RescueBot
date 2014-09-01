@@ -65,7 +65,9 @@ void loop(void)
   if (magEvent.magnetic.z < MagMinZ) MagMinZ = magEvent.magnetic.z;
   if (magEvent.magnetic.z > MagMaxZ) MagMaxZ = magEvent.magnetic.z;
  
-  if ((millis() - lastDisplayTime) > 1000)  // display once/second
+  Serial.println(magEvent.magnetic.y);
+  if(0)
+ // if ((millis() - lastDisplayTime) > 1000)  // display once/second
   {
     Serial.print("Accel Minimums: "); Serial.print(AccelMinX); Serial.print("  ");Serial.print(AccelMinY); Serial.print("  "); Serial.print(AccelMinZ); Serial.println();
     Serial.print("Accel Maximums: "); Serial.print(AccelMaxX); Serial.print("  ");Serial.print(AccelMaxY); Serial.print("  "); Serial.print(AccelMaxZ); Serial.println();

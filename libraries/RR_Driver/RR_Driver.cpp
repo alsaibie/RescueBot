@@ -27,7 +27,7 @@ void RR_Driver::driveManual(void)
 	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
 
 	int turnAngle=map(receiver.getSignal(AILE),1110,1920,-180,180);
-	if(0)
+	if(DBUG)
 	{
 		Serial.print(F("Mapped Throttle:  "));
 		Serial.print(throttle_sig); Serial.print(F("  "));
@@ -91,7 +91,8 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 	isObstacled(imudata, Situation);
 
 	if(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED)
-
+		Serial.print("Situation: ");
+		Serial.println(CLEAR);
 	switch(Situation)
 	{
 		case CLEAR:

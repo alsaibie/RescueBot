@@ -20,6 +20,7 @@ class RR_GPS: public Adafruit_GPS
 	void Disable(void);
 	void Update(void);
 	void getData(void);
+	float toRadians(float coordinate); //Change the name to capture the "from" format
 	~RR_GPS(void);
 	bool newGPSData;
 
@@ -27,7 +28,7 @@ private:
 	void getPosition(void);
 	void getBearing(void);
 	void getTimeDate(void);
-	float toRadians(float coordinate); //Change the name to capture the "from" format
+
 	RR_GPSData_t *gpsData;
 
 };

@@ -5,12 +5,13 @@
 RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 {
 	gpsData=data;
+	gpsData->targetLatidude=TARGET_LAT;
+	gpsData->targetLongitude=TARGET_LON;
 	gpsData->LatitudeRadianTarget=toRadians(TARGET_LAT);
 	gpsData->LongitudeRadianTarget=toRadians(TARGET_LON);
-
 	//Default to low on pin at constructor
 	pinMode(GPS_ENABLE_PIN, OUTPUT);
-	digitalWrite(GPS_ENABLE_PIN,LOW);
+	if(!DBUG) {digitalWrite(GPS_ENABLE_PIN,LOW);}
 }
 void RR_GPS::Disable(void)
 {
@@ -59,6 +60,7 @@ void RR_GPS::Update(void)
 		else
 		{
 					newGPSData=true;
+					gpsData->fix=fix;
 		}
 	}
 }
@@ -74,12 +76,14 @@ void RR_GPS::getData(void)
 void RR_GPS::getPosition(void)
 {
 	gpsData->Latitude=latitude;
+	if(lat=='S') gpsData->Latitude*=-1;
 	gpsData->Longitude=longitude;
+	if(lon=='W') gpsData->Longitude*=-1;
 	gpsData->Lat=lat;
 	gpsData->Lon=lon;
 	//Convert to Radians and store accordingly.
-	gpsData->LatitudeRadian=toRadians(latitude);
-	gpsData->LongitudeRadian=toRadians(longitude);
+	gpsData->LatitudeRadian=toRadians(gpsData->Latitude);
+	gpsData->LongitudeRadian=toRadians(gpsData->Longitude);
 
 }
 
@@ -99,13 +103,16 @@ void RR_GPS::getBearing(void)
 
 	// Using Haversine formula for calculating Over-the-surface distance
 	// Source: http://www.movable-type.co.uk/scripts/latlong.html
-	int R = 6371;   // Mean Earth radius
+	int R = 6371000;   // Mean Earth radius
 
 	float lat = gpsData->LatitudeRadian;
 	float latTarget = gpsData->LatitudeRadianTarget;
 	float lon = gpsData->LongitudeRadian;
 	float lonTarget = gpsData->LongitudeRadianTarget;
-
+	if(0){
+		Serial.print("Rob Location: "); Serial.print(lat,6); Serial.print(","); Serial.println(lon,6);
+		Serial.print("Target Location: "); Serial.print(latTarget,6); Serial.print(","); Serial.println(lonTarget,6);
+	}
 	float dlat = latTarget-lat;
 	float dlong = lonTarget-lon;
 
@@ -119,7 +126,10 @@ void RR_GPS::getBearing(void)
 	float x = cos(lat)*sin(latTarget)-sin(lat)*cos(latTarget)*cos(dlong);
 	
 	gpsData->Bearing = fmod((atan2(y,x)*57.295779513+360),360); // Multiplied by constant to convert to decimal degrees.
-  
+  	if(0){
+		Serial.print("Bearing: "); Serial.println(gpsData->Bearing);
+		Serial.print("Distance to Target: "); Serial.println(gpsData->DistanceToTarget);
+	}
 }
 
 

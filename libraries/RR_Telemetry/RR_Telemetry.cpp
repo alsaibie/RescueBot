@@ -45,14 +45,13 @@ bool RR_Telemetry::decodeMessage(void){
 			inCS^=databufferIncoming[i];
 		}
 		if(inCS == databufferIncoming[receive_array_ind-1]){
-			if(1) {Serial.println("Checksum Good :D");}
+			if(0) {Serial.println("Checksum Good :D");}
 		
 			//memcpy(incomingAddress, databufferIncoming,MSG_INPACKETSIZE);
-			Serial.println(databufferIncoming[0]);
 			memcpy(incomingAddress, databufferIncoming, sizeIncoming);
 			receive_array_ind=0;
 			if(DBUG){
-				printMsg();
+				//printMsg();
 			}
 		return true;
 		}
@@ -115,8 +114,34 @@ void RR_Telemetry::printMsg(void)
 	Serial.println(telemetryInMessage->Joystick.Pad_Right.X_Axis);
 	Serial.print("Joystick Right Y: ");
 	Serial.println(telemetryInMessage->Joystick.Pad_Right.Y_Axis);
+	Serial.print("StartState: ");
+	Serial.println(telemetryInMessage->StartState);
+	Serial.print("DriveMode: ");
+	Serial.println(telemetryInMessage->DriveMode);
 	
-	
+}
+bool RR_Telemetry::SendSettingCommand(const char  *str){
+	Serial3.write("+++");
+	if(DBUG){
+		while(Serial3.available()){
+			Serial.print(Serial3.read());
+		}
+	}
+	delay(1100);
+	Serial3.write(str);
+	if(DBUG){
+		while(Serial3.available()){
+			Serial.print(Serial3.read());
+		}
+	}
+	delay(1000);
+	Serial3.write("ATO");
+	if(DBUG){
+		while(Serial3.available()){
+			Serial.print(Serial3.read());
+		}
+	}
+	return 1;
 }
 
 RR_Telemetry::~RR_Telemetry(void)

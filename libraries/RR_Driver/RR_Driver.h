@@ -4,7 +4,8 @@
 #include "../RR_Encoder/RR_Encoder.h"
 #include "../RR_CommonDefines/RR_CommonDefines.h"
 #include "../RR_CommonData/RR_CommonData.h"
-
+#define ACCELERATION_LIMIT	2000 //Points per second
+#define MAXSPEEDCHANGE		100
 typedef struct joystick_t : RR_TelemetryIncomingMessage_t::Joystick_t{
 
 };
@@ -14,8 +15,9 @@ class RR_Driver
 public:
 	RR_Driver(RR_NavigationData_t *data);
 	void driveManual(void);
-	void driveManual(joystick_t data);
-	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata);
+	void driveManual(joystick_t data, uint16_t SamplingRate);
+	void driveManual(uint16_t SamplingRate);
+	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRateE);
 	void Enable(void);
 	void Stop(void);
 	NavigatingState_t NavigatingState;
@@ -31,6 +33,7 @@ private:
 	void tipoverMode(RR_IMUData_t &imudata); //When on the side and need to create imbalance 
 	void wigglingMode(Speed_t speedlevel = MEDIUM); //When Stuck and both wheels arent's moving much or both are free wheeling.
 	void reciprocatingMode(Speed_t speedleve = MEDIUM); //When not moving and one wheel is freewheeling.
+	int16_t accLimit(int16_t speed, int16_t speedOld, uint16_t SamplingRate);
 	//Situational Awareness Checks
 	//Situation Code TIPPED or WHEELS (LEFT_RIGHT:STALL, FREE or RUN(IN MOTION)) 
 	typedef enum {CLEAR=0, TIPPED, 
@@ -45,7 +48,8 @@ private:
 	RR_Encoder speedometer;
 	RR_Receiver receiver;
 	RR_Motor motors;
-	int16_t leftSpeed, rightSpeed;
+	int16_t leftSpeed, leftSpeedOld, rightSpeedOld, rightSpeed;
+	uint16_t EffectiveSamplingRate; //Effective Sampling Rate
 	RR_NavigationData_t *navigationdata;
 };
 

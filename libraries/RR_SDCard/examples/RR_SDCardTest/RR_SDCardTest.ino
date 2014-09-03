@@ -16,9 +16,9 @@ void setup() {
 	delay(2000);
 	loggerData.GPS.fix=true;
 	loggerData.GPS.Latitude=3347.342;
-	loggerData.GPS.Lat="N";
+
 	loggerData.GPS.Longitude=8424.003;
-	loggerData.GPS.Lon="W";
+
 	loggerData.GPSTime.Hour=12;
 	loggerData.GPSTime.Minute=50;
 	loggerData.GPSTime.Seconds=15;

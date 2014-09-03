@@ -9,7 +9,9 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #include <Arduino.h>
 
 #define DBUG true
-
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 typedef enum {SLOW, MEDIUM, FAST} Speed_t;
 typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t, StartMode_t;
 typedef enum {CRUISING, OBSTACLED} NavigatingState_t;

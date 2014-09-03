@@ -80,7 +80,7 @@ void RR_IMU::updateIMU(void)
 		Serial.print(orientation.heading);
 		Serial.println(F(""));
 	}
-	if(0)
+	if(DBUG)
 	{
 		Serial.print(F("Heading: "));
 		Serial.print(orientation.heading);
@@ -93,7 +93,8 @@ void RR_IMU::updateIMU(void)
 			
 			headingnew=(orientation.heading-180)*150/180+180;
 		}
-		//Serial.print(headingnew);
+		Serial.print(F("HeadingOff: "));
+		Serial.print(headingnew);
 
 		Serial.println(F(""));
 	}

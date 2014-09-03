@@ -75,10 +75,11 @@ void loop(void)
   /* Display the results (acceleration is measured in m/s^2) */
   accel.getEvent(&event);
  // Serial.print(F("ACCEL "));
+  if(0){
   Serial.print(event.acceleration.x,8); Serial.print(",");
   Serial.print(event.acceleration.y,8); Serial.print(",");
   Serial.print(event.acceleration.z,8); Serial.print(",");
-  
+  }
   /* Display the results (gyrocope values in rad/s) */
  // gyro.getEvent(&event);
  // Serial.print(event.gyro.x,8); Serial.print(",");
@@ -87,13 +88,13 @@ void loop(void)
   /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
   mag.getEvent(&event);
   //Serial.print((event.magnetic.x-1.95844616)/33.1688,8); Serial.print(",");
-  if(0){
+  if(1){
   Serial.print(event.magnetic.x,8); Serial.print(",");
   Serial.print(event.magnetic.y,8); Serial.print(",");
   Serial.print(event.magnetic.z,8); 
   Serial.println("");
   }
-	if(1){
+	if(0){
 	Serial.print((event.magnetic.x-mag_x_offset)/mag_x_scale,8); Serial.print(",");
 	Serial.print((event.magnetic.y-mag_y_offset)/mag_y_scale,8); Serial.print(",");
 	Serial.print((event.magnetic.z-mag_z_offset)/mag_z_scale,8);

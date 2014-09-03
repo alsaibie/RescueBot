@@ -119,11 +119,11 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 			/* Then convert the atmospheric pressure, SLP and temp to altitude    */
 			/* Update this next line with the current SLP for better results      */
 			float seaLevelPressure = SENSORS_PRESSURE_SEALEVELHPA;
-			Serial.print("Altitude: ");
+			Serial.print("A:");
 			Serial.print(bmp.pressureToAltitude(seaLevelPressure,
 												altimeter_event.pressure,
 												temperature)); 
-			Serial.println(F(" m"));
+			Serial.println(F("m"));
 		  }
 	}
 }

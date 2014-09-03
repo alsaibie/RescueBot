@@ -8,7 +8,7 @@
 
 RR_NavigationData_t	navdata;
 RR_Driver ScorpioDriver(&navdata);
-
+double lastMillis=0;
 void setup()
 {
 	Serial.begin(115200);
@@ -21,7 +21,8 @@ void setup()
 
 void loop()
 {
-	ScorpioDriver.driveManual();
+	ScorpioDriver.driveManual(uint16_t(millis()-lastMillis));
+	lastMillis=millis();
 	delay(100);
 }
 

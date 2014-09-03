@@ -3,6 +3,8 @@
 RR_Driver::RR_Driver(RR_NavigationData_t *data):receiver(), motors(), speedometer()
 {
 	navigationdata=data;
+	leftSpeedOld=0;
+	rightSpeedOld=0;
 }
 
 void RR_Driver::Enable(void)
@@ -68,25 +70,111 @@ void RR_Driver::driveManual(void)
 		rightSpeed=nominalSpeed;
 	}
 
-
 	motors.setM1Speed(leftSpeed);
 	motors.setM2Speed(rightSpeed);
 	navigationdata->leftMotorSpeed=leftSpeed;
 	navigationdata->rightMotorSpeed=rightSpeed;
 
 }
+void RR_Driver::driveManual(uint16_t SamplingRate)
+{
+	EffectiveSamplingRate=SamplingRate;
+	//Mixing Channels
+	int throttle_sig=receiver.getSignal(THRO);
+	if(throttle_sig<1100 || throttle_sig>2000) throttle_sig=1500;
+	int nominalSpeed=map(throttle_sig,1120,1960,-400,400);
+	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
 
-void RR_Driver::driveManual(joystick_t data){
+	int turnAngle=map(receiver.getSignal(AILE),1110,1920,-180,180);
+	if(DBUG)
+	{
+		Serial.print(F("Mapped Throttle:  "));
+		Serial.print(throttle_sig); Serial.print(F("  "));
+		Serial.println(nominalSpeed);
+		Serial.print(F("Mapped Steer:     "));
+		Serial.print(receiver.getSignal(AILE)); Serial.print(F("  "));
+		Serial.println(turnAngle);
+	}
+
+	if(turnAngle>20) //Turn Left
+	{
+		rightSpeed=nominalSpeed;
+		leftSpeed=(nominalSpeed*(1-(float)turnAngle/90));
+		if(0)
+			{
+				Serial.print(F("Mapped leftspeed:  "));
+				Serial.print(nominalSpeed); Serial.print(F("  "));
+				Serial.println(leftSpeed);
+			}
+
+	}
+	
+	else if(turnAngle<-20) //Turn Left
+	{
+		leftSpeed=nominalSpeed;
+		rightSpeed=(nominalSpeed*(1+(float)turnAngle/90));
+		if(0)
+			{
+				Serial.print(F("Mapped rightspeed:  "));
+				Serial.print(nominalSpeed); Serial.print(F("  "));
+				Serial.println(rightSpeed);
+			}
+
+	}
+	else
+	{
+		leftSpeed=nominalSpeed;
+		rightSpeed=nominalSpeed;
+	}
+
+
+	// Apply acceleration limit
+	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
+	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
+	if(DBUG) {
+		Serial.print("Left Speed: ");
+		Serial.println(leftSpeedOld);
+		Serial.print("Right Speed: ");
+		Serial.println(rightSpeedOld);
+	}
+	motors.setM1Speed(leftSpeedOld);
+	motors.setM2Speed(rightSpeedOld);
+	navigationdata->leftMotorSpeed=leftSpeedOld;
+	navigationdata->rightMotorSpeed=rightSpeedOld;
+
+}
+int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRate){
+
+	if(abs(speed-speedOld)>MAXSPEEDCHANGE)
+	{
+		speed = speedOld+sgn(speed-speedOld)*MAXSPEEDCHANGE;
+	}
+
+	if((abs(speed-speedOld)*1000L)/samplingRate>ACCELERATION_LIMIT)
+	{
+		return speedOld+(sgn(speed-speedOld)*ACCELERATION_LIMIT*samplingRate)/1000L;
+	}
+	else
+	{
+		return speed;
+	}
+}
+void RR_Driver::driveManual(joystick_t data, uint16_t SamplingRate){
+	EffectiveSamplingRate=SamplingRate;
 	leftSpeed=-map(data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
 	rightSpeed=-map(data.Pad_Right.Y_Axis,-32768, 32767,-400,400);
-	motors.setM1Speed(leftSpeed);
-	motors.setM2Speed(rightSpeed);
-	navigationdata->leftMotorSpeed=leftSpeed;
-	navigationdata->rightMotorSpeed=rightSpeed;
+	
+	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
+	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
+	motors.setM1Speed(leftSpeedOld);
+	motors.setM2Speed(rightSpeedOld);
+	navigationdata->leftMotorSpeed=leftSpeedOld;
+	navigationdata->rightMotorSpeed=rightSpeedOld;
 }
 
-void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata)
+void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRate)
 {
+	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
 	isObstacled(imudata, Situation);
 
@@ -121,21 +209,27 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
  
 void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 {
+	int16_t letfSpeed=0;
+	int16_t rightSpeed=0;
 	//Basic behavioral steering based on bearing bracket
 	if (abs(dHeading)<THRESHOLD_ANGLE_LOWER)
 	{
-		motors.setSpeeds(SPEED_CRUISE, SPEED_CRUISE);
+		leftSpeed=SPEED_CRUISE;
+		rightSpeed=SPEED_CRUISE;
+
 	}
 
 	else if(abs(dHeading)>THRESHOLD_ANGLE_LOWER && abs(dHeading)<THRESHOLD_ANGLE_UPPER)
 	{
 		if(dHeading>0)
 		{
-			motors.setSpeeds(SPEED_MANEUVER,SPEED_CRUISE);
+			leftSpeed=SPEED_MANEUVER;
+			rightSpeed=SPEED_CRUISE;
 		}
 		else
 		{
-			motors.setSpeeds(SPEED_MAX,SPEED_MANEUVER);
+			leftSpeed=SPEED_MAX;
+			rightSpeed=SPEED_MANEUVER;
 		}
 	}
 
@@ -143,13 +237,21 @@ void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 	{
 		if(dHeading>0)
 		{
-			motors.setSpeeds(-SPEED_LOW,SPEED_LOW);
+			leftSpeed=-SPEED_LOW;
+			rightSpeed=SPEED_LOW;
 		}
 		else
 		{
-			motors.setSpeeds(SPEED_LOW,-SPEED_LOW);
+			leftSpeed=SPEED_LOW;
+			rightSpeed=-SPEED_LOW;
 		}
 	}
+
+	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
+	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
+	navigationdata->leftMotorSpeed=leftSpeedOld;
+	navigationdata->rightMotorSpeed=rightSpeedOld;
+	motors.setSpeeds(leftSpeedOld, rightSpeedOld);
 }
 void RR_Driver::cruiseModeAdvanced(uint8_t dHeading)
 {
@@ -183,7 +285,8 @@ void RR_Driver::reciprocatingMode(Speed_t speedlevel)
 
 int8_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 {
-	int dHeading=gpsdata.Bearing-imudata.fused.heading;
+	int dHeading=uint16_t(gpsdata.Bearing+imudata.headingFiltered)%360;
+	dHeading = (dHeading>180? dHeading-360: dHeading);
 
 	if(DBUG)
 	{

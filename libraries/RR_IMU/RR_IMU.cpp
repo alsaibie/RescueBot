@@ -41,11 +41,11 @@ void RR_IMU::updateIMU(void)
 		accelFil_event.acceleration.z=imuFilterZ.step(accel_event.acceleration.z);
 		mag.getEvent(&mag_event);
 		gyro.getEvent(&gyro_event);
-		dof.fusionGetOrientation(&accelFil_event, &mag_event, &orientation);
+		//dof.fusionGetOrientation(&accelFil_event, &mag_event, &orientation);
 		//dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
 		//dof.accelGetOrientation(&accelFil_event,&orientation);
 		//dof.magTiltCompensation(SENSOR_AXIS_X, &mag_event, &accelFil_event);
-		//dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation);
+		dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation);
 
 	imuData->fused.heading=-orientation.heading;
 	/*
@@ -80,7 +80,7 @@ void RR_IMU::updateIMU(void)
 		Serial.print(orientation.heading);
 		Serial.println(F(""));
 	}
-	if(DBUG)
+	if(0)
 	{
 		Serial.print(F("Heading: "));
 		Serial.print(orientation.heading);
@@ -93,8 +93,8 @@ void RR_IMU::updateIMU(void)
 			
 			headingnew=(orientation.heading-180)*150/180+180;
 		}
-		Serial.print(F("HeadingOff: "));
-		Serial.print(headingnew);
+		//Serial.print(F("HeadingOff: "));
+		//Serial.print(headingnew);
 
 		Serial.println(F(""));
 	}

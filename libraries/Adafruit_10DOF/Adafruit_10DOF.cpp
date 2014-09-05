@@ -271,7 +271,11 @@ bool Adafruit_10DOF::magGetOrientation(sensors_axis_t axis, sensors_event_t *eve
   /* Normalize to 0-359° */
   if (orientation->heading < 0)
   {
-    orientation->heading = 360 + orientation->heading;
+    orientation->heading =  - orientation->heading;
+  }
+  else
+  {
+	  orientation->heading = 360 - orientation->heading;
   }
 
   return true;

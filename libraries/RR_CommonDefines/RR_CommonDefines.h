@@ -16,9 +16,9 @@ typedef enum {SLOW, MEDIUM, FAST} Speed_t;
 typedef enum {LAUNCHING, ASCENDING, LANDING, LANDED, NAVIGATING, FINISHED} MainState_t, StartMode_t;
 typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
 typedef enum {AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED,MANUAL_PC, MANUAL_3CH} DriveMode_t;
-typedef enum {ON, OFF} SwitchMode_t; 
+typedef enum {OFF, ON} SwitchMode_t; 
 typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
-
+#define USE_RECEIVER false
 #define LAUNCH_THRESHOLD 50
 #define LANDING_CHECK_THRESHOLD 10 //meters
 #define RTYPE 1 //1 for Rover else for quadrotor
@@ -28,8 +28,11 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define ENCODER_COUNT 48
 #define WHEEL_RADIUS 0.07f
 //WINNING NUMBERS - MODIFY ACCORDINGLY
-#define TARGET_LAT 3347.342f  //N  ddmm.mmmm
-#define TARGET_LON - 8424.003f //W dddmm.mmmm
+#define TARGET_LAT 3346.64750f  //N  ddmm.mmmm
+#define TARGET_LON - 8424.01783f //W dddmm.mmmm 
+
+//#define TARGET_LAT 3347.342f  //N  ddmm.mmmm
+//#define TARGET_LON - 8424.003f //W dddmm.mmmm
 //#define CURRENT_LOCATION F("21.12345,W, 21.12345,N")
 
 //GENERAL
@@ -45,9 +48,7 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 //SERIALS
 #define GPS_Serial Serial1
 
-//MACRO FUNCTIONS
-
-
+//MACRO FUNCTION
 
 //MOTOR
 #define FORWARD 1
@@ -66,7 +67,7 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define THRESHOLD_ANGLE_UPPER 60
 #define SPEED_MAX 400
 #define SPEED_CRUISE 350
-#define SPEED_MANEUVER 300
+#define SPEED_MANEUVER 330
 #define SPEED_LOW 200
 
 //ENCODER

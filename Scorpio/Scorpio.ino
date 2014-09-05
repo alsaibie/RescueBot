@@ -8,6 +8,8 @@
 /* for some reason I have to include all headers here! TODO: Fix This. Only Include RR_... Headers.
 *
 */
+
+
 #include <Filter.h>
 #include <vector.h>
 #include <quaternion.h>
@@ -15,15 +17,20 @@
 #include <imumaths.h>
 #include <ahrs.h>
 #include <RR_CommonData.h>
-#include <Encoder.h>
 #include <RR_IMU.h>
 #include <RR_Telemetry.h>
 #include <RR_Altimeter.h>
 #include <RR_MOSFET.h>
-#include <RR_Encoder.h>
 #include <RR_SDCard.h>
 #include <RR_Motor.h>
+#if USE_RECEIVER
 #include <RR_Receiver.h>
+#else
+#define ENCODER_OPTIMIZE_INTERRUPTS
+#include <Encoder.h>
+#include <RR_Encoder.h>
+#endif
+
 #include <RR_Driver.h>
 #include <RR_GPS.h>
 #include <RR_CommonDefines.h>
@@ -36,6 +43,7 @@
 #include <FreeRTOS_ARM.h>
 #include <basic_io_arm.h>
 #include <Wire.h>
+
 //Must include libraries not directly in "libraries" folder explicitly to compile with arduino ide
 #include "..\FreeRTOS_ARM\utility\task.h"
 #include "..\FreeRTOS_ARM\utility\semphr.h"
@@ -51,7 +59,7 @@
 
 //-------------OPTIONS------------
 uint8_t driveMode=
-	AUTONOMOUS_SIMPLE;
+	MANUAL_PC;
 StartMode_t startMode=NAVIGATING;
 //---------------------------------
 
@@ -59,6 +67,7 @@ StartMode_t startMode=NAVIGATING;
 MainState_t mainState=startMode;
 
 //Shared Data Structs
+
 RR_IMUData_t					IMUData;
 RR_AltimeterData_t				AltimeterData;
 RR_LoggerData_t					LoggerData;
@@ -66,6 +75,7 @@ RR_GPSData_t					GPSData;
 RR_NavigationData_t				NavigationData;
 RR_TelemetryIncomingMessage_t	TelemetryIncomingData;
 RR_TelemetryOutgoingMessage_t	TelemetryOutgoingData;
+
 
 // List of Objects
 /* Description:
@@ -92,9 +102,6 @@ static void vStateTask (void *pvParameters);
 xTaskHandle _htaskGPS, _htaskIMU, _htaskAltiemter,  _htaskDriver, _htaskTelemetry, _htaskLogger, _htaskState;
 //Semaphore/Mutex Handles
 xSemaphoreHandle GPSSemaphore, IMUSemaphore, TelemetryMutex, LoggerMutex, IMUAccessMutex, AltimeterSemaphore;
-//static xQueueSetHandle xNavigationQueueSet;
-//#define COMBINED_QUEUE_LENGTH 2
-//xQueueSetMemberHandle	xActivatedNavigationQueueMember;
 
 void setup()
 {
@@ -115,8 +122,6 @@ void setup()
 	xTaskCreate(vStateTask,		(signed portCHAR *)"State Task",		configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskState);
 	delay(1000);
 
-
-
 	//Create Binary Semaphore (Binary Semphore used to signal other threads everytime there is new data /
 	//and used here to protect access to sensor data
 	vSemaphoreCreateBinary(GPSSemaphore);
@@ -127,15 +132,7 @@ void setup()
 	TelemetryMutex	= xSemaphoreCreateMutex();
 	LoggerMutex		= xSemaphoreCreateMutex();
 	IMUAccessMutex	= xSemaphoreCreateMutex();
-	//Create Queue for Handling Data to Navigation Task
-	//xNavigationQueueSet = xQueueCreateSet( COMBINED_QUEUE_LENGTH );
 
-	//Add to Queue
-
-	//xQueueAddToSet(GPSSemaphore, xNavigationQueueSet);
-	//xQueueAddToSet(IMUSemaphore, xNavigationQueueSet);
-	//xQueueAddToSet(LoggerMutex, xNavigationQueueSet);
-	//
 	//Start Tasks
 	vTaskStartScheduler();
 
@@ -146,7 +143,7 @@ void setup()
 
 void loop()
 {
-	/* Nothing to see here. All loops are handled in xTasks */}
+/* Nothing to see here. All loops are handled in xTasks */}
 
 // STATE MACHINE TASK
 /*
@@ -158,6 +155,8 @@ static void vStateTask (void *pvParameters)
 {
 	// --- Task Options --- //
 	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
+	uint8_t fixConfirmInd=0;
+	GPSData.DistanceToTarget=10000;
 	// Task is always On!
 	// -------------------- //
 	while(1){
@@ -202,6 +201,13 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=2000L;
 				if(xSemaphoreTake(GPSSemaphore, portMAX_DELAY)){
 					if(GPSData.fix){
+						fixConfirmInd++;
+
+					}
+					else{
+						fixConfirmInd=0;
+					}
+					if(fixConfirmInd>3){
 						mainState=NAVIGATING;
 					}
 				}
@@ -210,7 +216,7 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=500L;
 				if(xSemaphoreTake(GPSSemaphore, portMAX_DELAY)){
 					if(GPSData.DistanceToTarget<10){
-						//mainState=FINISHED;
+						mainState=FINISHED;
 					}
 				}
 				break;
@@ -252,7 +258,6 @@ static void vGPSTask(void *pvParameters){
 			case LANDING: case LANDED: case NAVIGATING:
 				if(!taskOn){
 					gps.Enable();
-					//enable;
 					taskOn=true;
 				}
 				break;
@@ -266,7 +271,12 @@ static void vGPSTask(void *pvParameters){
 			gps.newGPSData=false;
 			if(gps.fix){
 				gps.getData();
-				if(DBUG){Serial.println("Fix");}
+				if(DBUG){Serial.println("Fix");
+				Serial.print("Dist 2 Tgt: ");
+				Serial.println(GPSData.DistanceToTarget);
+				Serial.print("BRing: ");
+				Serial.print(GPSData.Bearing);
+				}
 				xSemaphoreGive(GPSSemaphore);
 			}
 			else{
@@ -349,6 +359,7 @@ static void vIMUTask(void *pvParameters){
 				imuS.updateIMU();
 				xSemaphoreGive(IMUAccessMutex);
 			}
+
 			//Update Relevant Telemetry Data
 			
 			if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
@@ -362,7 +373,7 @@ static void vIMUTask(void *pvParameters){
 			if(SamplingTime*fvcounter>500L){
 				fvcounter=0;
 
-				if(DBUG) {Serial.print("Orientation: ");
+				if(0) {Serial.print("Orientation: ");
 				Serial.println(IMUData.headingFiltered);
 				}
 				xSemaphoreGive(IMUSemaphore);
@@ -465,7 +476,6 @@ static void vAltimeterTask(void *pvParameters){
 			//Update Relevant Logger Data
 			
 			if(xSemaphoreTake(LoggerMutex, 50/portTICK_RATE_MS)){
-				TBUG
 			LoggerData.Altitude=AltimeterData.altitude;
 			xSemaphoreGive(LoggerMutex);
 			}
@@ -494,18 +504,26 @@ static void vDriverTask(void *pvParameters){
 	// -------------------- //
 	while(1){
 		switch(mainState){
-			case LAUNCHING: case ASCENDING: case LANDING: case LANDED:
+			case LAUNCHING: case ASCENDING: case LANDING:
 				if(taskOn){
 					SamplingTime=500L;
 					taskOn=false;
 				}
 				break;
-			case NAVIGATING:
+			case LANDED:
 				if(!taskOn){
 						driver.Enable();
 						taskOn=true;
-						SamplingTime=100L;
+						driver.setFree();
 				}
+				SamplingTime=500L;
+				break;
+			case NAVIGATING:
+				if(!taskOn){
+						driver.Enable();
+						taskOn=true;		
+				}
+				SamplingTime=100L;
 				//if(DBUG) {Serial.println("Driver Task");}
 				if(driveMode==MANUAL_3CH){
 					driver.driveManual(uint16_t(millis()-lastMillis));
@@ -516,6 +534,7 @@ static void vDriverTask(void *pvParameters){
 					xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 					joystick_t joystick;
 					memcpy(&joystick,&TelemetryIncomingData.Joystick,sizeof(TelemetryIncomingData.Joystick));
+					int16_t actualSpeedLeft, actualSpeedRight;
 					driver.driveManual(joystick, uint16_t(millis()-lastMillis));
 					lastMillis=millis();
 					xSemaphoreGive(TelemetryMutex);
@@ -523,23 +542,22 @@ static void vDriverTask(void *pvParameters){
 				
 				else if(driveMode==AUTONOMOUS_SIMPLE){
 					
-					Serial.println("Autonomous Nav");
+					//Serial.println("Autonomous Nav");
 						if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
-							Serial.println("Navigation: GPS Semaphore Taken");
 							//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));
 							gpsDataNav.Bearing=0;
 						}
 					
 					if(xSemaphoreTake(IMUSemaphore, 50 / portTICK_RATE_MS)){
-						Serial.println("Navigation: IMU Semaphore Taken");
+						//Serial.println("Navigation: IMU Semaphore Taken");
 						memcpy(&imuDataNav,&IMUData,sizeof(IMUData));
 					}
 					
-					driver.driveAutonomous(gpsDataNav, imuDataNav, loggerDataNav, uint16_t(millis()-lastMillis));
+					//driver.driveAutonomous(gpsDataNav, imuDataNav, loggerDataNav, uint16_t(millis()-lastMillis));
 					lastMillis=millis();
 
 					loggerSamplingCounter++;
-					if(SamplingTime*loggerSamplingCounter>10000L){
+					if(SamplingTime*loggerSamplingCounter>5000L){
 						loggerSamplingCounter=0;
 						if(xSemaphoreTake(LoggerMutex, 200 / portTICK_RATE_MS)){
 							Serial.println("Navigation: Copy to logger data");
@@ -568,10 +586,32 @@ static void vTelemetryTask(void *pvParameters){
 	//TODO: only enable after launched
 	while(1)
 	{
+		switch(mainState)
+		{
+			case LAUNCHING: 
+				SamplingTime=1000L;
+				break;
+			case ASCENDING:
+				SamplingTime=100L;
+				break;
+			case LANDING:
+				SamplingTime=500L;
+				break;
+			case LANDED:
+				SamplingTime=1000L;
+				break;
+			case NAVIGATING:
+				//SamplingTime=5000L;
+				SamplingTime=100L;
+				break;
+			case FINISHED:
+				SamplingTime=10000L;
+				break;
+		}
 		//Serial.println("Telemetry Task");
 		xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
+		TelemetryOutgoingData.ellapsedm=millis()/1000;
 		radio.Update();
-		//driveMode=TelemetryIncomingData.DriveMode;
 		xSemaphoreGive(TelemetryMutex);
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
@@ -585,6 +625,8 @@ static void vTelemetryTask(void *pvParameters){
 static void vLoggerTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=100L;  //Sampling Time (ms) - Initially set at idle
+	WhatToLog_t whatToLog;
+	whatToLog.altitude=false; whatToLog.gps=false; whatToLog.imu=false; whatToLog.navigation=false;
 	// -------------------- //
 	if(xSemaphoreTake(LoggerMutex, portMAX_DELAY)){
 		sdcard.Initialize();
@@ -592,11 +634,37 @@ static void vLoggerTask(void *pvParameters){
 	}
 	while(1)
 	{
-		
+		switch(mainState)
+		{
+			case LAUNCHING: 
+				whatToLog.altitude=true;	whatToLog.gps=false;	whatToLog.imu=false;	whatToLog.navigation=false;
+				SamplingTime=500L;
+				break;
+			case ASCENDING:
+				whatToLog.altitude=true;	whatToLog.gps=false;	whatToLog.imu=false;	whatToLog.navigation=false;
+				SamplingTime=100L;
+				break;
+			case LANDING:
+				whatToLog.altitude=true;	whatToLog.gps=false;	whatToLog.imu=false;	whatToLog.navigation=false;
+				SamplingTime=500L;
+				break;
+			case LANDED:
+				whatToLog.altitude=true;	whatToLog.gps=false;	whatToLog.imu=false;	whatToLog.navigation=false;
+				SamplingTime=1000L;
+				break;
+			case NAVIGATING:
+				whatToLog.altitude=false;	whatToLog.gps=true;		whatToLog.imu=true;		whatToLog.navigation=true;
+				SamplingTime=10000L;
+				break;
+			case FINISHED:
+				whatToLog.altitude=false;	whatToLog.gps=true;		whatToLog.imu=false;	whatToLog.navigation=false;
+				SamplingTime=30000L;
+				break;
+		}
 		//Serial.println("Logger Task");
 		if(xSemaphoreTake(LoggerMutex, portMAX_DELAY)){
-		sdcard.updateLog();
-		xSemaphoreGive(LoggerMutex);
+			sdcard.updateLog(&whatToLog);
+			xSemaphoreGive(LoggerMutex);
 		}
 		
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);

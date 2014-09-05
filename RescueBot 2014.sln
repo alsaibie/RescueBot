@@ -53,6 +53,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IMUCalibrate", "IMUCalibrat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeIMU", "FreeIMU\FreeIMU.vcxproj", "{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RR_EncoderwTelemetryTest", "RR_EncoderwTelemetryTest\RR_EncoderwTelemetryTest.vcxproj", "{3B115028-3B18-41B8-872A-9967714E3552}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPSCalcTest", "GPSCalcTest\GPSCalcTest.vcxproj", "{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -163,6 +167,14 @@ Global
 		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Debug|Win32.Build.0 = Debug|Win32
 		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Release|Win32.ActiveCfg = Release|Win32
 		{CE2FA366-BF4E-47CE-B095-E1891DEA08FC}.Release|Win32.Build.0 = Release|Win32
+		{3B115028-3B18-41B8-872A-9967714E3552}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3B115028-3B18-41B8-872A-9967714E3552}.Debug|Win32.Build.0 = Debug|Win32
+		{3B115028-3B18-41B8-872A-9967714E3552}.Release|Win32.ActiveCfg = Release|Win32
+		{3B115028-3B18-41B8-872A-9967714E3552}.Release|Win32.Build.0 = Release|Win32
+		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Debug|Win32.Build.0 = Debug|Win32
+		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Release|Win32.ActiveCfg = Release|Win32
+		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

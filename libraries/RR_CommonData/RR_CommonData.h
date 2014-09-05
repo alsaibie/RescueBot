@@ -30,6 +30,7 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	int16_t Heading;
 	int16_t	Bearing;
 	uint16_t Altitude, baseAltitude, maxAltitude;
+	uint32_t ellapsedm;
 
 }RR_TelemetryOutgoingMessage_t;
 
@@ -52,7 +53,7 @@ struct RR_LoggerData_t
 		float	Latitude;	char Lat;
 		bool		fix;
 		int16_t		Bearing;
-		uint16_t	DistanceToTarget;
+		uint16_t	DistanceToTarget, DistanceTravelled;
 	}GPS;
 	struct Time_t
 	{
@@ -75,12 +76,16 @@ struct RR_LoggerData_t
 //Altimeter Data
 struct RR_AltimeterData_t
 {
-	uint32_t baseAltitude, maxAltitude;
-	uint32_t altitude;
+	uint32_t baseAltitude;
+	uint32_t  maxAltitude, altitude;
 	int16_t temperature;
 	bool Launched, Peaked, Landed;
 };
 
+struct WhatToLog_t
+{
+	bool altitude, gps, navigation, imu;
+};
 //Navigation Data
 struct RR_NavigationData_t
 {
@@ -98,7 +103,7 @@ struct RR_GPSData_t
 	float	LatitudeRadianTarget, LongitudeRadianTarget;
 	bool		fix;
 	int16_t			Bearing;
-	uint16_t		DistanceToTarget;
+	uint16_t		DistanceToTarget, DistanceTravelled;
 	uint8_t			Speed;
 	
 	struct Date_t

@@ -9,11 +9,11 @@ RR_MOSFET::RR_MOSFET(void)
 
 void RR_MOSFET::switchMOSFET(SwitchMode_t _mode)
 {
-	if(_mode==ON)
+	if(_mode)
 	{
 		digitalWrite(MOSFET_PIN,HIGH);
 	}
-	else if (_mode==OFF);
+	else
 	{
 		digitalWrite(MOSFET_PIN,LOW);
 	}

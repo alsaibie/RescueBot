@@ -1,6 +1,8 @@
 #pragma once
 #include "../RR_CommonDefines/RR_CommonDefines.h"
 #include "../RR_CommonData/RR_CommonData.h"
+
+typedef 
 //define message types here
 /* GPS Data Format 
 * $GPS,mcutime,Fix,GPSTIME,Latitude,Lat,Longitude,Lon,DistanceToTarget,Bearing,#
@@ -31,7 +33,7 @@ class RR_SDCard
 	void Initialize(void);
 	void WriteMessage(float _msg_value, const char *_msg_type);
 	void Write(const char *_str);
-	void updateLog(void);
+	void updateLog(WhatToLog_t *whattoLog);
 	//const char readFile(void); // Future implementation
 	~RR_SDCard(void);
 

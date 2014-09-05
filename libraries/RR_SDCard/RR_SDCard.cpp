@@ -81,53 +81,62 @@ void RR_SDCard::WriteMessage(float _msg_value, const char  *_msg_type)
 }
 
 
-void RR_SDCard::updateLog(void)
+void RR_SDCard::updateLog(WhatToLog_t *whattoLog)
 {
-	//Log GPS Data	
-	Serial2.print(GPS_LOG_MSG); comma;
-	Serial2.print((uint32_t)(millis()/100)); comma;
-	if(loggerData->GPS.fix){
-		Serial2.print("Y"); comma;
-		Serial2.print(loggerData->GPSTime.Hour); Serial2.print(loggerData->GPSTime.Minute); 
-		Serial2.print(loggerData->GPSTime.Seconds); comma;
-		Serial2.print(loggerData->GPS.Latitude,3); comma;
-		Serial2.print(loggerData->GPS.Lat); comma;
-		Serial2.print(loggerData->GPS.Longitude,3); comma;
-		Serial2.print(loggerData->GPS.Lon); comma;
-		Serial2.print(loggerData->GPS.DistanceToTarget); comma;
-		Serial2.print(loggerData->GPS.Bearing); comma;
-	}
-	else{
-		Serial2.print("N"); comma;
-	}
-	hashEnd;
-	//---------------
-
 	// Log State Data
 	Serial2.print(STATE_LOG_MSG); comma;
 	Serial2.print((uint32_t)(millis()/100)); comma;
 	Serial2.print(loggerData->State.mainstate); comma;
-	if(loggerData->State.mainstate==NAVIGATING){
-	Serial2.print(loggerData->State.navstate); comma;
-	}
 	hashEnd;
 	//---------------
 
+	//Log GPS Data
+	if(whattoLog->gps){
+		Serial2.print(GPS_LOG_MSG); comma;
+		Serial2.print((uint32_t)(millis()/100)); comma;
+		if(loggerData->GPS.fix){
+			Serial2.print("Y"); comma;
+			Serial2.print(loggerData->GPSTime.Hour); Serial2.print(loggerData->GPSTime.Minute); 
+			Serial2.print(loggerData->GPSTime.Seconds); comma;
+			Serial2.print(loggerData->GPS.Latitude,3); comma;
+			Serial2.print(loggerData->GPS.Lat); comma;
+			Serial2.print(loggerData->GPS.Longitude,3); comma;
+			Serial2.print(loggerData->GPS.Lon); comma;
+			Serial2.print(loggerData->GPS.DistanceToTarget); comma;
+			Serial2.print(loggerData->GPS.DistanceTravelled); comma;
+			Serial2.print(loggerData->GPS.Bearing); comma;
+		}
+		else{
+			Serial2.print("N"); comma;
+		}
+		hashEnd;
+	}
+	//---------------
+
+
 	//Log Navigation Data
-	if(loggerData->State.mainstate==NAVIGATING){
+	if(whattoLog->navigation){
 	Serial2.print(NAVIGATION_LOG_MSG); comma;
 	Serial2.print((uint32_t)(millis()/100)); comma;
 	Serial2.print(loggerData->Navigation.speed); comma;
+	Serial2.print(loggerData->Navigation.heading); comma;
+	Serial2.print(loggerData->State.navstate); comma;
 	hashEnd;
 	}
 	//---------------
 
 	//Log Altitude Data
-	if(loggerData->State.mainstate<NAVIGATING){
+	if(whattoLog->altitude){
 	Serial2.print(ALTITUDE_LOG_MSG); comma;
 	Serial2.print((uint32_t)(millis()/100)); comma;
 	Serial2.print(loggerData->Altitude); comma;
 	hashEnd;
+	}
+	//---------------
+
+	//Log IMU STUFF
+	if(whattoLog->imu){
+
 	}
 	//---------------
 }

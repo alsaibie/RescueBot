@@ -1,7 +1,13 @@
 #include "RR_Driver.h"
 
-RR_Driver::RR_Driver(RR_NavigationData_t *data):receiver(), motors(), speedometer()
+RR_Driver::RR_Driver(RR_NavigationData_t *data): motors() 
+#if USE_RECEIVER
+	,receiver()
+#else
+	,speedometer()
+#endif
 {
+
 	navigationdata=data;
 	leftSpeedOld=0;
 	rightSpeedOld=0;
@@ -22,6 +28,7 @@ void RR_Driver::Stop(void)
 
 void RR_Driver::driveManual(void)
 {
+#if USE_RECEIVER
 	//Mixing Channels
 	int throttle_sig=receiver.getSignal(THRO);
 	if(throttle_sig<1100 || throttle_sig>2000) throttle_sig=1500;
@@ -70,14 +77,14 @@ void RR_Driver::driveManual(void)
 		rightSpeed=nominalSpeed;
 	}
 
-	motors.setM1Speed(leftSpeed);
-	motors.setM2Speed(rightSpeed);
+	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
 	navigationdata->leftMotorSpeed=leftSpeed;
 	navigationdata->rightMotorSpeed=rightSpeed;
-
+#endif
 }
 void RR_Driver::driveManual(uint16_t SamplingRate)
 {
+#if USE_RECEIVER
 	EffectiveSamplingRate=SamplingRate;
 	//Mixing Channels
 	int throttle_sig=receiver.getSignal(THRO);
@@ -137,11 +144,10 @@ void RR_Driver::driveManual(uint16_t SamplingRate)
 		Serial.print("Right Speed: ");
 		Serial.println(rightSpeedOld);
 	}
-	motors.setM1Speed(leftSpeedOld);
-	motors.setM2Speed(rightSpeedOld);
+	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
 	navigationdata->leftMotorSpeed=leftSpeedOld;
 	navigationdata->rightMotorSpeed=rightSpeedOld;
-
+#endif
 }
 int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRate){
 
@@ -166,21 +172,41 @@ void RR_Driver::driveManual(joystick_t data, uint16_t SamplingRate){
 	
 	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
 	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
-	motors.setM1Speed(leftSpeedOld);
-	motors.setM2Speed(rightSpeedOld);
+	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
 	navigationdata->leftMotorSpeed=leftSpeedOld;
 	navigationdata->rightMotorSpeed=rightSpeedOld;
+	#if !USE_RECEIVER
+	speedometer.Update();
+	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
+	if(0){
+	Serial.print("right speed: "); Serial.println(rightActualSpeed);
+	Serial.print("left speed: "); Serial.println(leftActualSpeed);}
+	#endif
 }
 
 void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRate)
 {
+	#if !USE_RECEIVER
+	speedometer.Update();
+	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
+	if(0){
+	Serial.print("right speed: "); Serial.println(rightActualSpeed);
+	Serial.print("left speed: "); Serial.println(leftActualSpeed);}
+	#endif
 	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
 	isObstacled(imudata, Situation);
 
-	if(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED)
+	(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED);
+	if(Situation==CLEAR){
 		Serial.print("Situation: ");
 		Serial.println(CLEAR);
+	}
+	
+	//Check Obstacle Situation
+	isObstacled(imudata,Situation);
+	//------
+
 	switch(Situation)
 	{
 		case CLEAR:
@@ -197,7 +223,7 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 		case FREE_FREE:
 		case FREE_RUN:
 		case RUN_FREE:
-			wigglingMode();
+			wigglingMode(MEDIUM,2);
 			break;
 		case STALL_RUN:
 		case RUN_STALL:
@@ -207,7 +233,7 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 }
 
  
-void RR_Driver::cruiseModeSimple(uint8_t dHeading)
+void RR_Driver::cruiseModeSimple(int8_t dHeading)
 {
 	int16_t letfSpeed=0;
 	int16_t rightSpeed=0;
@@ -223,13 +249,13 @@ void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 	{
 		if(dHeading>0)
 		{
-			leftSpeed=SPEED_MANEUVER;
-			rightSpeed=SPEED_CRUISE;
+			leftSpeed=SPEED_CRUISE;
+			rightSpeed=SPEED_MANEUVER;
 		}
 		else
 		{
-			leftSpeed=SPEED_MAX;
-			rightSpeed=SPEED_MANEUVER;
+			leftSpeed=SPEED_MANEUVER;
+			rightSpeed=SPEED_CRUISE;
 		}
 	}
 
@@ -237,23 +263,30 @@ void RR_Driver::cruiseModeSimple(uint8_t dHeading)
 	{
 		if(dHeading>0)
 		{
-			leftSpeed=-SPEED_LOW;
-			rightSpeed=SPEED_LOW;
-		}
-		else
-		{
 			leftSpeed=SPEED_LOW;
 			rightSpeed=-SPEED_LOW;
 		}
+		else
+		{
+			leftSpeed=-SPEED_LOW;
+			rightSpeed=SPEED_LOW;
+		}
 	}
 
+	if(0){
+		Serial.print("Left Speed: ");
+		Serial.print(leftSpeedOld);
+		Serial.print(", Right: ");
+		Serial.println(rightSpeedOld);
+	}
 	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
 	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
 	navigationdata->leftMotorSpeed=leftSpeedOld;
 	navigationdata->rightMotorSpeed=rightSpeedOld;
-	motors.setSpeeds(leftSpeedOld, rightSpeedOld);
+	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
+	
 }
-void RR_Driver::cruiseModeAdvanced(uint8_t dHeading)
+void RR_Driver::cruiseModeAdvanced(int8_t dHeading)
 {
 	//If Compass Data is Reliable just have an efficient feedback steering logic
 	if(abs(dHeading)<10)
@@ -265,22 +298,50 @@ void RR_Driver::cruiseModeAdvanced(uint8_t dHeading)
 	{
 		//PD Controller for Steering
 	}
-	motors.setSpeeds(leftSpeed,rightSpeed);
+	motors.setSpeeds(rightSpeed, leftSpeed);
 }
 
 void RR_Driver::tipoverMode(RR_IMUData_t &imudata)
 {
 	//Timed Rotation or While its sideways
+	//For now just do a timed rotation routine
+	//but should incorporate imu so that routine will continue until
+	//robot is not stuck anymore - need noiseless accelerometer for that
+	motors.setSpeeds(400,-400);
+	delay(5000);
+	motors.setSpeeds(0,0);
+	delay(1000);
+	motors.setSpeeds(-400,400);
+	delay(5000);
+	motors.setSpeeds(0,0);
+
+}
+void RR_Driver::setFree(void){
+	wigglingMode(FAST,1);
 }
 
-void RR_Driver::wigglingMode(Speed_t speedlevel)
+void RR_Driver::wigglingMode(Speed_t speedlevel, uint8_t repeats)
 {
 	//Timed Reverse CW and CCW
+	motors.setSpeeds(400,-400);
+	delay(3000);
+	motors.setSpeeds(0,0);
+	delay(1000);
+	motors.setSpeeds(-400,400);
+	delay(3000);
+	motors.setSpeeds(0,0);
 }
 
 void RR_Driver::reciprocatingMode(Speed_t speedlevel)
 {
 	//Timed Back and Forth
+	motors.setSpeeds(400,400);
+	delay(3000);
+	motors.setSpeeds(0,0);
+	delay(1000);
+	motors.setSpeeds(-400,-400);
+	delay(3000);
+	motors.setSpeeds(0,0);
 }
 
 int8_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
@@ -290,11 +351,11 @@ int8_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 
 	if(DBUG)
 	{
-		Serial.print("Delta Heading:  ");
-		Serial.print(dHeading);
-		Serial.println(" deg");
+		Serial.print("Heading: ");
+		Serial.print(imudata.headingFiltered);
+		Serial.print(", Delta: ");
+		Serial.println(dHeading);
 	}
-
 	return dHeading;
 }
 

@@ -41,6 +41,8 @@ typedef struct RR_TelemetryIncomingMessage_t
 			int16_t X_Axis, Y_Axis;
         }Pad_Left, Pad_Right;
     }Joystick;
+
+	uint8_t bottum1;
 	uint8_t StartState;
     uint8_t DriveMode;
 }RR_TelemetryIncomingMessage_t;

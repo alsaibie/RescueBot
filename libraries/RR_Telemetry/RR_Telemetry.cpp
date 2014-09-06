@@ -17,6 +17,7 @@ RR_Telemetry::RR_Telemetry(RR_TelemetryOutgoingMessage_t *myOutgoingdata, RR_Tel
 
 bool RR_Telemetry::decodeMessage(void){
 	//if(DBUG) {Serial.println("Test");}
+	//TBUG
 	if(Serial3.available() >= 3){
 							
 		while(Serial3.read() != 0x06){
@@ -32,11 +33,18 @@ bool RR_Telemetry::decodeMessage(void){
 			if(DBUG) {Serial.println("Message Received Size Don't Match");}
 			return false;
 			}	
-		int receive_array_ind=0;
+		uint16_t receive_array_ind=0;
+		
 		while (Serial3.available() && receive_array_ind<=sizeIncoming){
-			databufferIncoming[receive_array_ind++] = Serial3.read();
+		//while (receive_array_ind<=sizeIncoming){
+				databufferIncoming[receive_array_ind++] = Serial3.read();
+				delay(2);
 		}
 		if((receive_array_ind-1)!=sizeIncoming) {
+			if(DBUG){
+				Serial.print("Struct Size: "); Serial.print(sizeIncoming);
+				Serial.print(" ,Received: "); Serial.println(receive_array_ind-1);
+			}
 			if(DBUG) {Serial.println("Message Buffer Not Same Size");}
 			return false;
 			}
@@ -59,8 +67,6 @@ bool RR_Telemetry::decodeMessage(void){
 			if(DBUG) {Serial.println("Checksum bad :(");}
 			return false;
 		}
-
-
 	}
 
 }
@@ -74,7 +80,6 @@ void RR_Telemetry::encodeMessage(void)
    (*outgoingPacketAddress)=0x06;
    (*++outgoingPacketAddress)=0x85;
    (*++outgoingPacketAddress)=MSG_OUTPACKETSIZE;
-
   for(uint8_t i = 0; i<MSG_OUTPACKETSIZE; i++)
   {
     CheckSum^=*(outgoingMsgAddress+i);

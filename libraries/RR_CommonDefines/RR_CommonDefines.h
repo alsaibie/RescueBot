@@ -28,8 +28,8 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define ENCODER_COUNT 48
 #define WHEEL_RADIUS 0.07f
 //WINNING NUMBERS - MODIFY ACCORDINGLY
-#define TARGET_LAT 3346.64750f  //N  ddmm.mmmm
-#define TARGET_LON - 8424.01783f //W dddmm.mmmm 
+#define TARGET_LAT 3346.650f  //N  ddmm.mmmm
+#define TARGET_LON - 8424.032f //W dddmm.mmmm 
 
 //#define TARGET_LAT 3347.342f  //N  ddmm.mmmm
 //#define TARGET_LON - 8424.003f //W dddmm.mmmm
@@ -63,8 +63,8 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define MOTOR1_PWM_PIN 22
 #define MOTOR2_PWM_PIN 20
 //DRIVER
-#define THRESHOLD_ANGLE_LOWER 30
-#define THRESHOLD_ANGLE_UPPER 60
+#define THRESHOLD_ANGLE_LOWER 45
+#define THRESHOLD_ANGLE_UPPER 90
 #define SPEED_MAX 400
 #define SPEED_CRUISE 350
 #define SPEED_MANEUVER 330

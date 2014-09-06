@@ -153,12 +153,13 @@ int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRa
 
 	if(abs(speed-speedOld)>MAXSPEEDCHANGE)
 	{
-		speed = speedOld+sgn(speed-speedOld)*MAXSPEEDCHANGE;
+		//speed = speedOld+sgn(speed-speedOld)*MAXSPEEDCHANGE;
 	}
 
 	if((abs(speed-speedOld)*1000L)/samplingRate>ACCELERATION_LIMIT)
 	{
 		return speedOld+(sgn(speed-speedOld)*ACCELERATION_LIMIT*samplingRate)/1000L;
+		//return speed;
 	}
 	else
 	{
@@ -314,15 +315,17 @@ void RR_Driver::tipoverMode(RR_IMUData_t &imudata)
 	motors.setSpeeds(-400,400);
 	delay(5000);
 	motors.setSpeeds(0,0);
+	delay(1000);
 
 }
 void RR_Driver::setFree(void){
-	wigglingMode(FAST,1);
+	wigglingMode(FAST,2);
 }
 
 void RR_Driver::wigglingMode(Speed_t speedlevel, uint8_t repeats)
 {
 	//Timed Reverse CW and CCW
+	for(uint8_t k = 0; k < repeats; k++){
 	motors.setSpeeds(400,-400);
 	delay(3000);
 	motors.setSpeeds(0,0);
@@ -330,6 +333,8 @@ void RR_Driver::wigglingMode(Speed_t speedlevel, uint8_t repeats)
 	motors.setSpeeds(-400,400);
 	delay(3000);
 	motors.setSpeeds(0,0);
+	delay(1000);
+	}
 }
 
 void RR_Driver::reciprocatingMode(Speed_t speedlevel)

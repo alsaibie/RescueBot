@@ -59,7 +59,7 @@
 
 //-------------OPTIONS------------
 uint8_t driveMode=
-	MANUAL_PC;
+	AUTONOMOUS_SIMPLE;
 StartMode_t startMode=NAVIGATING;
 //---------------------------------
 
@@ -113,10 +113,10 @@ void setup()
 
 
 	//Create Tasks
-	xTaskCreate(vGPSTask,		(signed portCHAR *)"GPS Task",			configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskGPS);
+	xTaskCreate(vGPSTask,		(signed portCHAR *)"GPS Task",			configMINIMAL_STACK_SIZE + 300, NULL, tskIDLE_PRIORITY + 2, &_htaskGPS);
 	xTaskCreate(vIMUTask,		(signed portCHAR *)"IMU Task",			configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskIMU);
 	xTaskCreate(vAltimeterTask, (signed portCHAR *)"Altimeter Task",	configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskAltiemter);
-	xTaskCreate(vDriverTask,	(signed portCHAR *)"Driver Task",		configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskDriver);
+	xTaskCreate(vDriverTask,	(signed portCHAR *)"Driver Task",		configMINIMAL_STACK_SIZE + 200, NULL, tskIDLE_PRIORITY + 2, &_htaskDriver);
 	xTaskCreate(vTelemetryTask, (signed portCHAR *)"Telemetry Task",	configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskTelemetry);
 	xTaskCreate(vLoggerTask,	(signed portCHAR *)"Logger Task",		configMINIMAL_STACK_SIZE + 1000, NULL, tskIDLE_PRIORITY + 2, &_htaskLogger);
 	xTaskCreate(vStateTask,		(signed portCHAR *)"State Task",		configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskState);
@@ -193,6 +193,7 @@ static void vStateTask (void *pvParameters)
 					if(AltimeterData.Landed){
 						//Burn Rope
 						nichrome.switchMOSFET(ON); delay(2000); nichrome.switchMOSFET(OFF);
+						delay(10000);
 						mainState=LANDED;
 					}
 				}
@@ -214,7 +215,8 @@ static void vStateTask (void *pvParameters)
 				break;
 			case NAVIGATING:
 				SamplingTime=500L;
-				if(xSemaphoreTake(GPSSemaphore, portMAX_DELAY)){
+				if(xSemaphoreTake(GPSSemaphore, 200/portTICK_RATE_MS)){
+					if(DBUG){Serial.println("STATEEE");}
 					if(GPSData.DistanceToTarget<10){
 						mainState=FINISHED;
 					}
@@ -240,7 +242,7 @@ static void vStateTask (void *pvParameters)
 */
 static void vGPSTask(void *pvParameters){
 	// --- Task Options --- //
-	uint16_t SamplingTime= 2000L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
+	uint16_t SamplingTime= 750L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
 	bool taskOn=false;
 
 	// -------------------- //
@@ -501,6 +503,7 @@ static void vDriverTask(void *pvParameters){
 	RR_NavigationData_t navDataNav;
 	uint16_t		loggerSamplingCounter=0;
 	double			lastMillis=0;
+	gpsDataNav.Bearing=0;
 	// -------------------- //
 	while(1){
 		switch(mainState){
@@ -543,17 +546,24 @@ static void vDriverTask(void *pvParameters){
 				else if(driveMode==AUTONOMOUS_SIMPLE){
 					
 					//Serial.println("Autonomous Nav");
-						if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
+					if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
+							 TBUG TBUG TBUG
+							if(GPSData.fix){
 							//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));
-							gpsDataNav.Bearing=0;
+								
+								gpsDataNav.Bearing=GPSData.Bearing;
+								Serial.println(gpsDataNav.Bearing);
+							}
+
 						}
 					
 					if(xSemaphoreTake(IMUSemaphore, 50 / portTICK_RATE_MS)){
+						
 						//Serial.println("Navigation: IMU Semaphore Taken");
 						memcpy(&imuDataNav,&IMUData,sizeof(IMUData));
 					}
 					
-					//driver.driveAutonomous(gpsDataNav, imuDataNav, loggerDataNav, uint16_t(millis()-lastMillis));
+					driver.driveAutonomous(gpsDataNav, imuDataNav, loggerDataNav, uint16_t(millis()-lastMillis));
 					lastMillis=millis();
 
 					loggerSamplingCounter++;
@@ -582,6 +592,7 @@ static void vDriverTask(void *pvParameters){
 static void vTelemetryTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=100L;  //Sampling Time (ms) - Initially set at idle
+	bool mosfetSwitched = false;
 	// -------------------- //
 	//TODO: only enable after launched
 	while(1)
@@ -601,8 +612,17 @@ static void vTelemetryTask(void *pvParameters){
 				SamplingTime=1000L;
 				break;
 			case NAVIGATING:
-				//SamplingTime=5000L;
-				SamplingTime=100L;
+				if(driveMode==MANUAL_PC){
+					SamplingTime=100L;			
+				}
+				else{
+					if(DBUG){
+						SamplingTime=1000L;
+					}
+					else{
+						SamplingTime=5000L;
+					}
+				}
 				break;
 			case FINISHED:
 				SamplingTime=10000L;
@@ -612,6 +632,18 @@ static void vTelemetryTask(void *pvParameters){
 		xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 		TelemetryOutgoingData.ellapsedm=millis()/1000;
 		radio.Update();
+		if(TelemetryIncomingData.bottum1){
+			Serial.println("B Pressed");
+			if(!mosfetSwitched){
+				mosfetSwitched=true;
+				Serial.println("Mosfet Switched");
+				nichrome.switchMOSFET(ON);
+				delay(2000);
+				nichrome.switchMOSFET(OFF);
+			}
+
+		}
+
 		xSemaphoreGive(TelemetryMutex);
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}

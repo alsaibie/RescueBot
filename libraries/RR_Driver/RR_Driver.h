@@ -10,7 +10,7 @@
 
 #include "../RR_CommonDefines/RR_CommonDefines.h"
 #include "../RR_CommonData/RR_CommonData.h"
-#define ACCELERATION_LIMIT	2000 //Points per second
+#define ACCELERATION_LIMIT	800 //Points per second
 #define MAXSPEEDCHANGE		100
 typedef struct joystick_t : RR_TelemetryIncomingMessage_t::Joystick_t{
 

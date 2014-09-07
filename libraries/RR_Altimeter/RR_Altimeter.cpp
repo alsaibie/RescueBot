@@ -50,9 +50,9 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 			// Do Nothing
 			break;
 		case checkLAUNCH:
-			if(DBUG){
+			if(DBUG2){
 				Serial.print("Alt: "); Serial.print(altimeterData->altitude);
-				Serial.print(" , Base+Threshold"); Serial.println(altimeterData->baseAltitude+LAUNCH_THRESHOLD);
+				Serial.print(" , Base+Threshold: "); Serial.println(altimeterData->baseAltitude+LAUNCH_THRESHOLD);
 			}
 			if((altimeterData->altitude)>(altimeterData->baseAltitude+LAUNCH_THRESHOLD)){
 				
@@ -67,8 +67,9 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 				checkPeakInd=0;
 			}
 			// If read altitude is smaller than X% of the max altitude incerment counter. 
-			else if((altimeterData->altitude)<(100/100)*(altimeterData->maxAltitude)){
+			else if((altimeterData->altitude)<(altimeterData->maxAltitude)){
 				checkPeakInd++;
+				
 			}
 
 			if(checkPeakInd==10)
@@ -86,12 +87,16 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 						if(0){Serial.print("Landing Counter: ");
 					Serial.println(checkLandingcounter);
 					}
-			if(SamplingTime*checkLandingcounter>4000L){
+			if(SamplingTime*checkLandingcounter>1000L){
 				//TBUG
 				checkLandingcounter=0;
-				if (abs(altimeterData->altitude-checkLandingAltitude)<LANDING_CHECK_THRESHOLD){
+				if(DBUG2) {
+					Serial.print("Alt :"); Serial.print(altimeterData->altitude);
+					Serial.print(" checklandalt: "); Serial.print(checkLandingAltitude);
+					Serial.print(" Dif Alti: "); Serial.println(altimeterData->altitude-checkLandingAltitude);}
+				if (abs(int(altimeterData->altitude)-checkLandingAltitude)<LANDING_CHECK_THRESHOLD){
 					checkLandingInd++;
-					if(DBUG){Serial.print("F: ");
+					if(DBUG2){Serial.print("LandingCounter: ");
 					Serial.println(checkLandingInd);
 					}
 				}

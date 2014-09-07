@@ -118,7 +118,8 @@ void RR_SDCard::updateLog(WhatToLog_t *whattoLog)
 	if(whattoLog->navigation){
 	Serial2.print(NAVIGATION_LOG_MSG); comma;
 	Serial2.print((uint32_t)(millis()/100)); comma;
-	Serial2.print(loggerData->Navigation.speed); comma;
+	Serial2.print(loggerData->Navigation.speedleft); comma;
+	Serial2.print(loggerData->Navigation.speedright); comma;
 	Serial2.print(loggerData->Navigation.heading); comma;
 	Serial2.print(loggerData->State.navstate); comma;
 	hashEnd;

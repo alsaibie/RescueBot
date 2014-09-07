@@ -3,7 +3,6 @@
  *
  * This example code is in the public domain.
  */
-
 #include <Encoder.h>
 
 // Change these two numbers to the pins connected to your encoder.
@@ -14,6 +13,7 @@ Encoder myEnc(5, 6);
 //   avoid using pins with LEDs attached
 
 void setup() {
+	
   Serial.begin(9600);
   Serial.println("Basic Encoder Test:");
 }

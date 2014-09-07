@@ -26,7 +26,7 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	float Latitude;
 	float Longitude;
     float targetLatidude, targetLongitude;
-	uint16_t DistanceToTarget;
+	uint16_t DistanceToTarget, DistanceTravelled;
 	int16_t Heading;
 	int16_t	Bearing;
 	uint16_t Altitude, baseAltitude, maxAltitude;
@@ -70,7 +70,7 @@ struct RR_LoggerData_t
 	}State;
 
 	struct Navigation_t{
-		int16_t speed;
+		int16_t speedleft, speedright;
 		int16_t heading;
 	}Navigation;
 };

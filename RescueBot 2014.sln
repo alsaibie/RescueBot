@@ -57,6 +57,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RR_EncoderwTelemetryTest", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPSCalcTest", "GPSCalcTest\GPSCalcTest.vcxproj", "{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPS_Slave", "GPS_Slave\GPS_Slave.vcxproj", "{D6D5867C-321A-4AF4-884A-E07C4AA17841}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROMTest", "EEPROMTest\EEPROMTest.vcxproj", "{D19BF338-0119-405D-BC53-93EC45315276}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -175,6 +179,14 @@ Global
 		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Debug|Win32.Build.0 = Debug|Win32
 		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Release|Win32.ActiveCfg = Release|Win32
 		{D1541C75-0878-4EC3-B2BF-69DE45EC84B9}.Release|Win32.Build.0 = Release|Win32
+		{D6D5867C-321A-4AF4-884A-E07C4AA17841}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D6D5867C-321A-4AF4-884A-E07C4AA17841}.Debug|Win32.Build.0 = Debug|Win32
+		{D6D5867C-321A-4AF4-884A-E07C4AA17841}.Release|Win32.ActiveCfg = Release|Win32
+		{D6D5867C-321A-4AF4-884A-E07C4AA17841}.Release|Win32.Build.0 = Release|Win32
+		{D19BF338-0119-405D-BC53-93EC45315276}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D19BF338-0119-405D-BC53-93EC45315276}.Debug|Win32.Build.0 = Debug|Win32
+		{D19BF338-0119-405D-BC53-93EC45315276}.Release|Win32.ActiveCfg = Release|Win32
+		{D19BF338-0119-405D-BC53-93EC45315276}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

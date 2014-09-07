@@ -8,7 +8,8 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #include <ctype.h>
 #include <Arduino.h>
 
-#define DBUG true
+#define DBUG false
+#define DBUG2 true
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
@@ -19,7 +20,7 @@ typedef enum {AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED,MANUAL_PC, MANUAL_3CH} Driv
 typedef enum {OFF, ON} SwitchMode_t; 
 typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define USE_RECEIVER false
-#define LAUNCH_THRESHOLD 50
+#define LAUNCH_THRESHOLD 0
 #define LANDING_CHECK_THRESHOLD 10 //meters
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");

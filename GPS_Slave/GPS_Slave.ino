@@ -10,7 +10,6 @@
 */
 
 
-#include <EEPROM.h>
 #include <Filter.h>
 #include <vector.h>
 #include <quaternion.h>
@@ -59,17 +58,14 @@
 #define F(str) str
 
 //-------------OPTIONS------------
-//#define USE_EEPROM
-uint8_t * stateEEPROMaddr = (uint8_t *)0x01;
 uint8_t driveMode=
 	MANUAL_PC;
-//Define Start Mode, works only when not retrieving state from EEPROM
-StartMode_t startMode= 
-	NAVIGATING;
+StartMode_t startMode=FINISHED;
 //---------------------------------
 
 //Global Variables - Ideally each task needs to know the state only, data is exchanged through protected data structs.
-MainState_t mainState;
+MainState_t mainState=startMode;
+
 //Shared Data Structs
 
 RR_IMUData_t					IMUData;
@@ -109,14 +105,6 @@ xSemaphoreHandle GPSSemaphore, IMUSemaphore, TelemetryMutex, LoggerMutex, IMUAcc
 
 void setup()
 {
-
-	#ifdef USE_EEPROM
-	mainState=(MainState_t)eeprom_read_byte(stateEEPROMaddr);
-	#else
-	 mainState=startMode;
-	 eeprom_write_byte(stateEEPROMaddr,LAUNCHING);
-	#endif
-	
 	if(DBUG)
 	{Serial.begin(115200);}
 	
@@ -126,24 +114,24 @@ void setup()
 
 	//Create Tasks
 	xTaskCreate(vGPSTask,		(signed portCHAR *)"GPS Task",			configMINIMAL_STACK_SIZE + 300, NULL, tskIDLE_PRIORITY + 2, &_htaskGPS);
-	xTaskCreate(vIMUTask,		(signed portCHAR *)"IMU Task",			configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskIMU);
-	xTaskCreate(vAltimeterTask, (signed portCHAR *)"Altimeter Task",	configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskAltiemter);
-	xTaskCreate(vDriverTask,	(signed portCHAR *)"Driver Task",		configMINIMAL_STACK_SIZE + 200, NULL, tskIDLE_PRIORITY + 2, &_htaskDriver);
+	//xTaskCreate(vIMUTask,		(signed portCHAR *)"IMU Task",			configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskIMU);
+	//xTaskCreate(vAltimeterTask, (signed portCHAR *)"Altimeter Task",	configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskAltiemter);
+	//xTaskCreate(vDriverTask,	(signed portCHAR *)"Driver Task",		configMINIMAL_STACK_SIZE + 200, NULL, tskIDLE_PRIORITY + 2, &_htaskDriver);
 	xTaskCreate(vTelemetryTask, (signed portCHAR *)"Telemetry Task",	configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskTelemetry);
-	xTaskCreate(vLoggerTask,	(signed portCHAR *)"Logger Task",		configMINIMAL_STACK_SIZE + 1000, NULL, tskIDLE_PRIORITY + 2, &_htaskLogger);
-	xTaskCreate(vStateTask,		(signed portCHAR *)"State Task",		configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskState);
-	delay(2000);
+	//xTaskCreate(vLoggerTask,	(signed portCHAR *)"Logger Task",		configMINIMAL_STACK_SIZE + 1000, NULL, tskIDLE_PRIORITY + 2, &_htaskLogger);
+	//xTaskCreate(vStateTask,		(signed portCHAR *)"State Task",		configMINIMAL_STACK_SIZE + 100, NULL, tskIDLE_PRIORITY + 2, &_htaskState);
+	delay(1000);
 
 	//Create Binary Semaphore (Binary Semphore used to signal other threads everytime there is new data /
 	//and used here to protect access to sensor data
 	vSemaphoreCreateBinary(GPSSemaphore);
-	vSemaphoreCreateBinary(IMUSemaphore);
-	vSemaphoreCreateBinary(AltimeterSemaphore);
+	//vSemaphoreCreateBinary(IMUSemaphore);
+	//vSemaphoreCreateBinary(AltimeterSemaphore);
 
 	//Create Mutex (Mutex are used to share a protected resouce where multiple threads have write/read access)
 	TelemetryMutex	= xSemaphoreCreateMutex();
-	LoggerMutex		= xSemaphoreCreateMutex();
-	IMUAccessMutex	= xSemaphoreCreateMutex();
+	//LoggerMutex		= xSemaphoreCreateMutex();
+	//IMUAccessMutex	= xSemaphoreCreateMutex();
 
 	//Start Tasks
 	vTaskStartScheduler();
@@ -162,7 +150,7 @@ void loop()
 * Description: This task will observe changes in states and update the state flag accordingly.
 * This task controls how other tasks behave.
 *
-*/
+
 static void vStateTask (void *pvParameters)
 {
 	// --- Task Options --- //
@@ -179,7 +167,6 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=500L;
 				if(xSemaphoreTake(AltimeterSemaphore, portMAX_DELAY)){						
 					if(AltimeterData.Launched){
-						eeprom_write_byte(stateEEPROMaddr,ASCENDING);
 						mainState=ASCENDING;
 					}
 				}
@@ -188,14 +175,12 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=50L;
 				if(xSemaphoreTake(AltimeterSemaphore, portMAX_DELAY)){						
 					if(AltimeterData.Peaked){
-						eeprom_write_byte(stateEEPROMaddr,LANDING);
 						mainState=LANDING;
-						if(xSemaphoreTake(TelemetryMutex, 100/ portTICK_RATE_MS)){
+						if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
 						TelemetryOutgoingData.maxAltitude=AltimeterData.maxAltitude;
 						xSemaphoreGive(TelemetryMutex);
 						}
-
-						if(xSemaphoreTake(LoggerMutex, 100/portTICK_RATE_MS)){
+						if(xSemaphoreTake(LoggerMutex, portMAX_DELAY)){
 						sdcard.WriteMessage(AltimeterData.maxAltitude,"$MaxAlt: ");
 						xSemaphoreGive(LoggerMutex);
 						}
@@ -203,22 +188,19 @@ static void vStateTask (void *pvParameters)
 				}
 				break;
 			case LANDING:
-				SamplingTime=50L;
-				if(xSemaphoreTake(AltimeterSemaphore, 100/portTICK_RATE_MS)){						
+				SamplingTime=200L;
+				if(xSemaphoreTake(AltimeterSemaphore, portMAX_DELAY)){						
 					if(AltimeterData.Landed){
 						//Burn Rope
-						if(DBUG2){Serial.println("Burn Rope and wait a few sec");}
 						nichrome.switchMOSFET(ON); delay(2000); nichrome.switchMOSFET(OFF);
-						eeprom_write_byte(stateEEPROMaddr,LANDED);
 						delay(10000);
-	
 						mainState=LANDED;
 					}
 				}
 				break;
 			case LANDED:
 				SamplingTime=2000L;
-				if(xSemaphoreTake(GPSSemaphore, 200/portTICK_RATE_MS)){
+				if(xSemaphoreTake(GPSSemaphore, portMAX_DELAY)){
 					if(GPSData.fix){
 						fixConfirmInd++;
 
@@ -227,7 +209,6 @@ static void vStateTask (void *pvParameters)
 						fixConfirmInd=0;
 					}
 					if(fixConfirmInd>3){
-						eeprom_write_byte(stateEEPROMaddr,NAVIGATING);
 						mainState=NAVIGATING;
 					}
 				}
@@ -235,9 +216,8 @@ static void vStateTask (void *pvParameters)
 			case NAVIGATING:
 				SamplingTime=500L;
 				if(xSemaphoreTake(GPSSemaphore, 200/portTICK_RATE_MS)){
-					if(DBUG){Serial.println("NAV:GPS");}
+					if(DBUG){Serial.println("STATEEE");}
 					if(GPSData.DistanceToTarget<10){
-						eeprom_write_byte(stateEEPROMaddr,FINISHED);
 						mainState=FINISHED;
 					}
 				}
@@ -246,21 +226,14 @@ static void vStateTask (void *pvParameters)
 				SamplingTime=5000L;
 				break;
 		}
-		
 		if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
-			TelemetryOutgoingData.LaunchState=mainState;
+		TelemetryOutgoingData.LaunchState=mainState;
 		xSemaphoreGive(TelemetryMutex);
 		}
-
-		if(xSemaphoreTake(LoggerMutex, 200/portTICK_RATE_MS)){
-			LoggerData.State.mainstate=mainState;
-		xSemaphoreGive(LoggerMutex);
-		}
-		
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
 }
-
+*/
 // GPS TASK
 /*
 * Description: This task will read and parse a new GPS message at the set sampling time\
@@ -269,7 +242,7 @@ static void vStateTask (void *pvParameters)
 */
 static void vGPSTask(void *pvParameters){
 	// --- Task Options --- //
-	uint16_t SamplingTime= 1000L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
+	uint16_t SamplingTime= 1100L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
 	bool taskOn=false;
 
 	// -------------------- //
@@ -284,7 +257,7 @@ static void vGPSTask(void *pvParameters){
 					taskOn=false;
 				}
 				break;
-			 case LANDING: case LANDED: case NAVIGATING: case FINISHED:
+			case LANDING: case LANDED: case NAVIGATING: case FINISHED:
 				if(!taskOn){
 					gps.Enable();
 					taskOn=true;
@@ -303,8 +276,8 @@ static void vGPSTask(void *pvParameters){
 				if(DBUG){Serial.println("Fix");
 				Serial.print("Dist 2 Tgt: ");
 				Serial.println(GPSData.DistanceToTarget);
-				Serial.print("Bearing: ");
-				Serial.println(GPSData.Bearing);
+				Serial.print("BRing: ");
+				Serial.print(GPSData.Bearing);
 				}
 				xSemaphoreGive(GPSSemaphore);
 			}
@@ -323,25 +296,24 @@ static void vGPSTask(void *pvParameters){
 			TelemetryOutgoingData.Longitude=GPSData.Longitude;
 			TelemetryOutgoingData.targetLatidude=GPSData.targetLatidude;
 			TelemetryOutgoingData.targetLongitude=GPSData.targetLongitude;
-			TelemetryOutgoingData.DistanceTravelled=GPSData.DistanceTravelled;
 			TelemetryOutgoingData.DistanceToTarget=GPSData.DistanceToTarget;
 			TelemetryOutgoingData.Bearing=GPSData.Bearing;
 			xSemaphoreGive(TelemetryMutex);
 			}
 
 			//Update Relevant Logger Data
+			/*
 			if(xSemaphoreTake(LoggerMutex, 200/portTICK_RATE_MS)){
 			memcpy(&LoggerData.GPSTime, &GPSData.Time, sizeof(GPSData.Date));
-			LoggerData.GPS.fix=GPSData.fix;
 			LoggerData.GPS.Latitude=GPSData.Latitude;
 			LoggerData.GPS.Lat=GPSData.Lat;
 			LoggerData.GPS.Longitude=GPSData.Longitude;
 			LoggerData.GPS.Lon=GPSData.Lon;
-			LoggerData.GPS.DistanceTravelled=GPSData.DistanceTravelled;
 			LoggerData.GPS.DistanceToTarget=GPSData.DistanceToTarget;
 			LoggerData.GPS.Bearing=GPSData.Bearing;
 			xSemaphoreGive(LoggerMutex);
 			}
+			*/
 		}
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
@@ -351,7 +323,7 @@ static void vGPSTask(void *pvParameters){
 /*
 * Description: 
 *
-*/
+
 static void vIMUTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
@@ -423,12 +395,13 @@ static void vIMUTask(void *pvParameters){
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);	
 	}
 }
+*/
 
 // ALTIMETER TASK
 /*
 * Description
 *
-*/
+
 static void vAltimeterTask(void *pvParameters){	
 	// --- Task Options --- //
 	uint16_t SamplingTime=500L;  //Sampling Time (ms) - Initially set at idle
@@ -490,7 +463,7 @@ static void vAltimeterTask(void *pvParameters){
 			if(xSemaphoreTake(IMUAccessMutex, portMAX_DELAY)){		
 				altimeter.updateAltimeter(altimeterTask, SamplingTime); //Depending on the task the update function will perform it and update the
 													//data struct flags accordingly. 
-				if(0){Serial.print("M:"); Serial.println(millis());}
+				if(DBUG){Serial.print("M:"); Serial.println(millis());}
 				xSemaphoreGive(IMUAccessMutex);
 			}
 
@@ -516,12 +489,12 @@ static void vAltimeterTask(void *pvParameters){
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);	
 	}
 }
-
+*/
 // DRIVER TASK
 /*
 * Description: This task will 
 *
-*/
+
 static void vDriverTask(void *pvParameters){
 
 	// --- Task Options --- //
@@ -577,12 +550,12 @@ static void vDriverTask(void *pvParameters){
 					
 					//Serial.println("Autonomous Nav");
 					if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
-							// TBUG TBUG TBUG
+							 TBUG TBUG TBUG
 							if(GPSData.fix){
 							//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));
 								
 								gpsDataNav.Bearing=GPSData.Bearing;
-								if(DBUG){Serial.println(gpsDataNav.Bearing);}
+								Serial.println(gpsDataNav.Bearing);
 							}
 
 						}
@@ -600,9 +573,7 @@ static void vDriverTask(void *pvParameters){
 					if(SamplingTime*loggerSamplingCounter>5000L){
 						loggerSamplingCounter=0;
 						if(xSemaphoreTake(LoggerMutex, 200 / portTICK_RATE_MS)){
-							if(0){Serial.println("Navigation: Copy to logger data");}
-							LoggerData.Navigation.speedleft=loggerDataNav.Navigation.speedleft;
-							LoggerData.Navigation.speedright=loggerDataNav.Navigation.speedright;
+							Serial.println("Navigation: Copy to logger data");
 							xSemaphoreGive(LoggerMutex);
 						}
 					}
@@ -615,6 +586,7 @@ static void vDriverTask(void *pvParameters){
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
 }
+*/
 
 // TELEMETRY TASK
 /*
@@ -657,7 +629,7 @@ static void vTelemetryTask(void *pvParameters){
 				}
 				break;
 			case FINISHED:
-				SamplingTime=5000L;
+				SamplingTime=1000L;
 				break;
 		}
 		//Serial.println("Telemetry Task");
@@ -685,7 +657,7 @@ static void vTelemetryTask(void *pvParameters){
 /*
 * Description: This task will log data onto the SD Card.
 *
-*/
+
 static void vLoggerTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime=100L;  //Sampling Time (ms) - Initially set at idle
@@ -734,5 +706,5 @@ static void vLoggerTask(void *pvParameters){
 		vTaskDelay((SamplingTime * configTICK_RATE_HZ) / 1000L);
 	}
 }
-
+*/
 

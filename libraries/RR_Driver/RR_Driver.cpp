@@ -199,9 +199,11 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 	isObstacled(imudata, Situation);
 
 	(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED);
-	if(Situation==CLEAR){
-		Serial.print("Situation: ");
-		Serial.println(CLEAR);
+	if(DBUG){
+		if(Situation==CLEAR){
+			Serial.print("Situation: ");
+			Serial.println(CLEAR);
+		}
 	}
 	
 	//Check Obstacle Situation
@@ -231,6 +233,8 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 			cruiseModeSimple(getdHeading(imudata, gpsdata));
 			break;
 	}
+	loggerdata.Navigation.speedleft		=	navigationdata->leftMotorSpeed;
+	loggerdata.Navigation.speedright	=	navigationdata->rightMotorSpeed;
 }
 
  
@@ -284,6 +288,7 @@ void RR_Driver::cruiseModeSimple(int8_t dHeading)
 	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
 	navigationdata->leftMotorSpeed=leftSpeedOld;
 	navigationdata->rightMotorSpeed=rightSpeedOld;
+	
 	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
 	
 }

@@ -59,13 +59,13 @@
 #define F(str) str
 
 //-------------OPTIONS------------
-//#define USE_EEPROM
+#define USE_EEPROM
 uint8_t * stateEEPROMaddr = (uint8_t *)0x01;
 uint8_t driveMode=
 	MANUAL_PC;
 //Define Start Mode, works only when not retrieving state from EEPROM
 StartMode_t startMode= 
-	NAVIGATING;
+	LAUNCHING;
 //---------------------------------
 
 //Global Variables - Ideally each task needs to know the state only, data is exchanged through protected data structs.
@@ -185,7 +185,7 @@ static void vStateTask (void *pvParameters)
 				}
 				break;
 			case ASCENDING:
-				SamplingTime=50L;
+				SamplingTime=100L;
 				if(xSemaphoreTake(AltimeterSemaphore, portMAX_DELAY)){						
 					if(AltimeterData.Peaked){
 						eeprom_write_byte(stateEEPROMaddr,LANDING);
@@ -203,12 +203,12 @@ static void vStateTask (void *pvParameters)
 				}
 				break;
 			case LANDING:
-				SamplingTime=50L;
+				SamplingTime=100L;
 				if(xSemaphoreTake(AltimeterSemaphore, 100/portTICK_RATE_MS)){						
 					if(AltimeterData.Landed){
 						//Burn Rope
 						if(DBUG2){Serial.println("Burn Rope and wait a few sec");}
-						nichrome.switchMOSFET(ON); delay(2000); nichrome.switchMOSFET(OFF);
+						nichrome.switchMOSFET(ON); delay(3000); nichrome.switchMOSFET(OFF);
 						eeprom_write_byte(stateEEPROMaddr,LANDED);
 						delay(10000);
 	
@@ -666,13 +666,14 @@ static void vTelemetryTask(void *pvParameters){
 		radio.Update();
 		if(TelemetryIncomingData.bottum1){
 			Serial.println("B Pressed");
-			if(!mosfetSwitched){
+			//if(!mosfetSwitched){
 				mosfetSwitched=true;
 				Serial.println("Mosfet Switched");
 				nichrome.switchMOSFET(ON);
 				delay(2000);
 				nichrome.switchMOSFET(OFF);
-			}
+				TelemetryIncomingData.bottum1=false;
+			//}
 
 		}
 

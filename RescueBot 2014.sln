@@ -61,6 +61,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GPS_Slave", "GPS_Slave\GPS_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROMTest", "EEPROMTest\EEPROMTest.vcxproj", "{D19BF338-0119-405D-BC53-93EC45315276}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotorDriverBoard", "MotorDriverBoard\MotorDriverBoard.vcxproj", "{359355BF-23C8-4103-B089-10415D95791C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -187,6 +189,10 @@ Global
 		{D19BF338-0119-405D-BC53-93EC45315276}.Debug|Win32.Build.0 = Debug|Win32
 		{D19BF338-0119-405D-BC53-93EC45315276}.Release|Win32.ActiveCfg = Release|Win32
 		{D19BF338-0119-405D-BC53-93EC45315276}.Release|Win32.Build.0 = Release|Win32
+		{359355BF-23C8-4103-B089-10415D95791C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{359355BF-23C8-4103-B089-10415D95791C}.Debug|Win32.Build.0 = Debug|Win32
+		{359355BF-23C8-4103-B089-10415D95791C}.Release|Win32.ActiveCfg = Release|Win32
+		{359355BF-23C8-4103-B089-10415D95791C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

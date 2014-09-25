@@ -35,7 +35,7 @@ public:
 private:
 
 	//Driving Routines
-	void cruiseModeSimple(int8_t bearing);
+	void cruiseModeSimple(int16_t bearing);
 	void cruiseModeAdvanced(int8_t bearing);
 	void tipoverMode(RR_IMUData_t &imudata); //When on the side and need to create imbalance 
 	void wigglingMode(Speed_t speedlevel = MEDIUM, uint8_t repeats = 1); //When Stuck and both wheels arent's moving much or both are free wheeling.
@@ -49,7 +49,7 @@ private:
 		RUN_STALL, RUN_FREE} Situation_t;
 	void isObstacled(RR_IMUData_t &imudata, Situation_t &situation);
 	//Navigation Tasks
-	int8_t getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata);		
+	int16_t getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata);		
 	
 	//Internal Components
 #if USE_RECEIVER

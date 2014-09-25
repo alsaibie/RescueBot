@@ -76,7 +76,7 @@ void RR_Driver::driveManual(void)
 		leftSpeed=nominalSpeed;
 		rightSpeed=nominalSpeed;
 	}
-
+	
 	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
 	navigationdata->leftMotorSpeed=leftSpeed;
 	navigationdata->rightMotorSpeed=rightSpeed;
@@ -188,8 +188,8 @@ void RR_Driver::driveManual(joystick_t data, uint16_t SamplingRate){
 void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRate)
 {
 	#if !USE_RECEIVER
-	speedometer.Update();
-	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
+	//speedometer.Update();
+	//speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
 	if(0){
 	Serial.print("right speed: "); Serial.println(rightActualSpeed);
 	Serial.print("left speed: "); Serial.println(leftActualSpeed);}
@@ -238,7 +238,7 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 }
 
  
-void RR_Driver::cruiseModeSimple(int8_t dHeading)
+void RR_Driver::cruiseModeSimple(int16_t dHeading)
 {
 	int16_t letfSpeed=0;
 	int16_t rightSpeed=0;
@@ -282,7 +282,9 @@ void RR_Driver::cruiseModeSimple(int8_t dHeading)
 		Serial.print("Left Speed: ");
 		Serial.print(leftSpeedOld);
 		Serial.print(", Right: ");
-		Serial.println(rightSpeedOld);
+		Serial.print(rightSpeedOld);
+		Serial.print(", dHeading: ");
+		Serial.println(dHeading);
 	}
 	leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
 	rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
@@ -324,7 +326,9 @@ void RR_Driver::tipoverMode(RR_IMUData_t &imudata)
 
 }
 void RR_Driver::setFree(void){
-	wigglingMode(FAST,2);
+	motors.setSpeeds(SPEED_LOW,SPEED_LOW);
+	delay(50000);
+	motors.setSpeeds(0,0);
 }
 
 void RR_Driver::wigglingMode(Speed_t speedlevel, uint8_t repeats)
@@ -354,9 +358,9 @@ void RR_Driver::reciprocatingMode(Speed_t speedlevel)
 	motors.setSpeeds(0,0);
 }
 
-int8_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
+int16_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 {
-	int dHeading=uint16_t(gpsdata.Bearing+imudata.headingFiltered)%360;
+	int16_t dHeading=uint16_t(gpsdata.Bearing+imudata.headingFiltered)%360;
 	dHeading = (dHeading>180? dHeading-360: dHeading);
 
 	if(DBUG)

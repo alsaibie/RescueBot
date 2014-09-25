@@ -120,7 +120,7 @@ void RR_GPS::getBearing(void)
 	float c = 2*atan2(sqrt(a),sqrt(1-a));
 	
 	gpsData->DistanceToTarget = R*c;
-
+	if(DBUG2){Serial.println(gpsData->DistanceToTarget);}
 	// Using the formula for bearing to calculate the required current heading.
 	float y = sin(dlong)*cos(latTarget);
 	float x = cos(lat)*sin(latTarget)-sin(lat)*cos(latTarget)*cos(dlong);
@@ -138,6 +138,10 @@ float RR_GPS::toRadians(float coordinate)
   float min = fmod(coordinate, 100.0)/60.0;
   float deg = float(int(coordinate/100));
   return (deg+min)*PI/180.0;
+  if(0){
+	  Serial.println(min);
+	  Serial.println(deg);
+  }
 }
 
 RR_GPS::~RR_GPS(void)

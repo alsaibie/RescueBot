@@ -19,8 +19,8 @@ typedef enum {CRUISING, OBSTACLED} NavigatingState_t;
 typedef enum {AUTONOMOUS_SIMPLE, AUTONOMOUS_ADVANCED,MANUAL_PC, MANUAL_3CH} DriveMode_t;
 typedef enum {OFF, ON} SwitchMode_t; 
 typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
-#define USE_RECEIVER false
-#define LAUNCH_THRESHOLD 50
+#define USE_RECEIVER true
+#define LAUNCH_THRESHOLD 150
 #define LANDING_CHECK_THRESHOLD 10 //meters
 #define RTYPE 1 //1 for Rover else for quadrotor
 #define TBUG Serial.println("Test");
@@ -29,8 +29,11 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define ENCODER_COUNT 48
 #define WHEEL_RADIUS 0.07f
 //WINNING NUMBERS - MODIFY ACCORDINGLY
-#define TARGET_LAT 3346.650f  //N  ddmm.mmmm
-#define TARGET_LON - 8424.032f //W dddmm.mmmm 
+#define TARGET_LAT 4051.775f  //N  ddmm.mmmm
+#define TARGET_LON - 11908.118f //W dddmm.mmmm 
+//#define TARGET_LAT 4039.781f  //N  ddmm.mmmm
+//#define TARGET_LON - 11921.352f //W dddmm.mmmm 
+
 
 //#define TARGET_LAT 3347.342f  //N  ddmm.mmmm
 //#define TARGET_LON - 8424.003f //W dddmm.mmmm
@@ -64,11 +67,11 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define MOTOR1_PWM_PIN 22
 #define MOTOR2_PWM_PIN 20
 //DRIVER
-#define THRESHOLD_ANGLE_LOWER 45
-#define THRESHOLD_ANGLE_UPPER 90
+#define THRESHOLD_ANGLE_LOWER 35
+#define THRESHOLD_ANGLE_UPPER 120
 #define SPEED_MAX 400
-#define SPEED_CRUISE 350
-#define SPEED_MANEUVER 330
+#define SPEED_CRUISE 380
+#define SPEED_MANEUVER 365
 #define SPEED_LOW 200
 
 //ENCODER

@@ -59,13 +59,13 @@
 #define F(str) str
 
 //-------------OPTIONS------------
-#define USE_EEPROM
+//#define USE_EEPROM
 uint8_t * stateEEPROMaddr = (uint8_t *)0x01;
 uint8_t driveMode=
 	MANUAL_PC;
 //Define Start Mode, works only when not retrieving state from EEPROM
 StartMode_t startMode= 
-	LAUNCHING;
+	NAVIGATING;
 //---------------------------------
 
 //Global Variables - Ideally each task needs to know the state only, data is exchanged through protected data structs.
@@ -582,6 +582,7 @@ static void vDriverTask(void *pvParameters){
 							//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));
 								
 								gpsDataNav.Bearing=GPSData.Bearing;
+								//gpsDataNav.Bearing=0;
 								if(DBUG){Serial.println(gpsDataNav.Bearing);}
 							}
 
@@ -595,7 +596,7 @@ static void vDriverTask(void *pvParameters){
 					
 					driver.driveAutonomous(gpsDataNav, imuDataNav, loggerDataNav, uint16_t(millis()-lastMillis));
 					lastMillis=millis();
-
+					
 					loggerSamplingCounter++;
 					if(SamplingTime*loggerSamplingCounter>5000L){
 						loggerSamplingCounter=0;

@@ -86,7 +86,7 @@ void RR_Altimeter::updateAltimeter(AltimeterTask_t altimeterTask, uint16_t Sampl
 						if(0){Serial.print("Landing Counter: ");
 					Serial.println(checkLandingcounter);
 					}
-			if(SamplingTime*checkLandingcounter>20000L){
+			if(SamplingTime*checkLandingcounter>25000L){
 				//TBUG
 				checkLandingcounter=0;
 				if(DBUG2) {

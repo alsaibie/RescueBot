@@ -24,7 +24,7 @@ void setup()
   Serial.println("RR_Motor Test");
   md.init();
   md.setM1Speed(400);
-  //md.setM2Speed(400);
+  md.setM2Speed(400);
 }
 
 void loop()

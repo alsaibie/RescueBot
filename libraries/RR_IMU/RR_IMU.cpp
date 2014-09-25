@@ -47,7 +47,7 @@ void RR_IMU::updateIMU(void)
 		//dof.magTiltCompensation(SENSOR_AXIS_X, &mag_event, &accelFil_event);
 		dof.magGetOrientation(SENSOR_AXIS_Z, &mag_event, &orientation);
 
-	imuData->fused.heading=-orientation.heading;
+
 	/*
 	imuData->fused.roll=orientation.roll;
 	imuData->fused.pitch=orientation.pitch;
@@ -80,24 +80,66 @@ void RR_IMU::updateIMU(void)
 		Serial.print(orientation.heading);
 		Serial.println(F(""));
 	}
-	if(0)
+if(0)
 	{
 		Serial.print(F("Heading: "));
-		Serial.print(orientation.heading);
+		Serial.println(orientation.heading);
+}
 		float headingnew;
-		if(orientation.heading<180){
-			headingnew=orientation.heading*180/150;
-		}
-		else
-		{
-			
-			headingnew=(orientation.heading-180)*150/180+180;
-		}
-		//Serial.print(F("HeadingOff: "));
-		//Serial.print(headingnew);
+		float current_heading = orientation.heading;
+		/*
+		float imu_north = 7;
+		float imu_west = 65;
+		float imu_south = 157;
+		float imu_east = 294;
+		*/
+		float imu_north = 13;
+		float imu_west = 66;
+		float imu_south = 103;
+		float imu_east = 320;
 
-		Serial.println(F(""));
+		if (imu_north<180) {
+			if ((current_heading>imu_north) && (current_heading<imu_west)) {
+				headingnew = (current_heading-imu_north)*90/(imu_west-imu_north);
+			}
+			else if ((current_heading>imu_west) && (current_heading<imu_south)) {
+				headingnew = (current_heading-imu_west)*90/(imu_south-imu_west)+90;
+			}
+			else if ((current_heading>imu_south) && (current_heading<imu_east)) {
+				headingnew = (current_heading-imu_south)*90/(imu_east-imu_south)+180;
+			}
+			else if ((current_heading<imu_north) && (current_heading>0)) {
+				headingnew = (current_heading+360-imu_east)*90/(imu_north+360-imu_east)+270;
+			}
+			else if (current_heading>imu_east) {
+				headingnew = (current_heading-imu_east)*90/(imu_north+360-imu_east)+270;			}
+		}
+		else if (imu_north>180) {
+			if ((current_heading>imu_east) && (current_heading<imu_north)) {
+				headingnew = (current_heading-imu_east)*90/(imu_north-imu_east)+270;
+			}
+			else if ((current_heading>imu_west) && (current_heading<imu_south)) {
+				headingnew = (current_heading-imu_west)*90/(imu_south-imu_west)+90;
+			}
+			else if ((current_heading>imu_south) && (current_heading<imu_east)) {
+				headingnew = (current_heading-imu_south)*90/(imu_east-imu_south)+180;
+			}
+			else if ((current_heading>imu_north) && (current_heading<360)) {
+				headingnew = (current_heading-imu_north)*90/(360-imu_north+imu_west);
+			}
+			else if (current_heading<imu_west) {
+				headingnew = (current_heading+360-imu_north)*90/(360-imu_north+imu_west);
+
+			}
+
+		}
+		if(0){
+		Serial.print(F("NewHeading: "));
+		Serial.println(headingnew);
 	}
+
+	imuData->fused.heading=-orientation.heading;
+		//imuData->fused.heading=-headingnew;
 		if(0)
 	{
 		Serial.print("X: "); Serial.print(accel_event.acceleration.x); Serial.print("  ");

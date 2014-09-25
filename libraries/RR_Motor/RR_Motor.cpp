@@ -106,14 +106,14 @@ void RR_Motor::setSpeeds(int m1Speed, int m2Speed)
 unsigned int RR_Motor::getM1CurrentMilliamps()
 {
   // 5V / 1024 ADC counts / 525 mV per A = 9 mA per count
-  return analogRead(_M1FB) * 9;
+  return analogRead(MOTOR1_FB_PIN) * 9;
 }
 
 // Return motor 2 current value in milliamps.
 unsigned int RR_Motor::getM2CurrentMilliamps()
 {
   // 5V / 1024 ADC counts / 525 mV per A = 9 mA per count
-  return analogRead(_M2FB) * 9;
+  return analogRead(MOTOR2_FB_PIN) * 9;
 }
 
 // Return error status

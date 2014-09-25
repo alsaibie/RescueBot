@@ -22,7 +22,8 @@ void setup()
 void loop()
 {
 	ScorpioDriver.driveManual(uint16_t(millis()-lastMillis));
+
 	lastMillis=millis();
-	delay(100);
+	delay(500);
 }
 

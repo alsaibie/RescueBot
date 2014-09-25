@@ -23,19 +23,22 @@ void setup()
   delay(3000); // Delay to see output on serial
   Serial.println("RR_Motor Test");
   md.init();
-  md.setM1Speed(400);
-  md.setM2Speed(400);
+  md.setM1Speed(200);
+  md.setM2Speed(0);
 }
 
 void loop()
 {
+
+	Serial.println(md.getM1CurrentMilliamps());
+	delay(2000);
 	// Accelerate Forward Motor 1 
 	/*
   for (int i = 0; i <= 400; i++)
   {
     md.setM1Speed(i);
    // stopIfFault();
-    if (abs(i)%200 == 100)
+    if (abs(i)%100 == 100)
     {
       Serial.print("M1 current: ");
       Serial.println(md.getM1CurrentMilliamps());
@@ -50,7 +53,7 @@ void loop()
   {
     md.setM1Speed(i);
     stopIfFault();
-    if (abs(i)%200 == 100)
+    if (abs(i)%100 == 100)
     {
       Serial.print("M1 current: ");
       Serial.println(md.getM1CurrentMilliamps());

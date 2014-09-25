@@ -560,6 +560,7 @@ static void vDriverTask(void *pvParameters){
 				//if(DBUG) {Serial.println("Driver Task");}
 				if(driveMode==MANUAL_3CH){
 					driver.driveManual(uint16_t(millis()-lastMillis));
+
 					lastMillis=millis();
 				}
 

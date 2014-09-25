@@ -93,14 +93,14 @@ void RR_Driver::driveManual(uint16_t SamplingRate)
 	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
 
 	int turnAngle=map(receiver.getSignal(AILE),1110,1920,-180,180);
-	if(DBUG)
+	if(DBUG2)
 	{
 		Serial.print(F("Mapped Throttle:  "));
 		Serial.print(throttle_sig); Serial.print(F("  "));
 		Serial.println(nominalSpeed);
-		Serial.print(F("Mapped Steer:     "));
-		Serial.print(receiver.getSignal(AILE)); Serial.print(F("  "));
-		Serial.println(turnAngle);
+		//Serial.print(F("Mapped Steer:     "));
+		//Serial.print(receiver.getSignal(AILE)); Serial.print(F("  "));
+		//Serial.println(turnAngle);
 	}
 
 	if(turnAngle>20) //Turn Left
@@ -144,9 +144,14 @@ void RR_Driver::driveManual(uint16_t SamplingRate)
 		Serial.print("Right Speed: ");
 		Serial.println(rightSpeedOld);
 	}
-	motors.setSpeeds(rightSpeedOld, leftSpeedOld);
+	//motors.setSpeeds(rightSpeedOld, leftSpeedOld);
+	motors.setSpeeds(rightSpeedOld, 0);
 	navigationdata->leftMotorSpeed=leftSpeedOld;
 	navigationdata->rightMotorSpeed=rightSpeedOld;
+	Serial.print("M1 Current:");
+	Serial.println(motors.getM1CurrentMilliamps());
+	//Serial.print("M2 Current:");
+	//Serial.println(motors.getM2CurrentMilliamps());
 #endif
 }
 int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRate){
@@ -179,7 +184,7 @@ void RR_Driver::driveManual(joystick_t data, uint16_t SamplingRate){
 	#if !USE_RECEIVER
 	speedometer.Update();
 	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
-	if(0){
+	if(DBUG2){
 	Serial.print("right speed: "); Serial.println(rightActualSpeed);
 	Serial.print("left speed: "); Serial.println(leftActualSpeed);}
 	#endif

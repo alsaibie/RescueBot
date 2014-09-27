@@ -201,6 +201,7 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 	#endif
 	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
+	//Check Obstacle Situation
 	isObstacled(imudata, Situation);
 
 	(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED);
@@ -211,8 +212,6 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 		}
 	}
 	
-	//Check Obstacle Situation
-	isObstacled(imudata,Situation);
 	//------
 
 	switch(Situation)
@@ -379,7 +378,10 @@ int16_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 }
 
 void RR_Driver::isObstacled(RR_IMUData_t &imudata, Situation_t &Situation)
-{}	
+{
+
+	//Situation = something, either CLEAR or 
+}	
 
 RR_Driver::~RR_Driver(void)
 {

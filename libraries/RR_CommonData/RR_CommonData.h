@@ -107,7 +107,7 @@ struct RR_GPSData_t
 	int16_t			Bearing;
 	uint16_t		DistanceToTarget, DistanceTravelled;
 	uint8_t			Speed;
-	
+	//bool			isMoving;
 	struct Date_t
 	{
 		uint16_t Year;

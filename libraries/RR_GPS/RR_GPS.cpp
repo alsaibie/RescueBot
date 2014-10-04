@@ -9,6 +9,7 @@ RR_GPS::RR_GPS(RR_GPSData_t *data):Adafruit_GPS(&GPS_Serial)
 	gpsData->targetLongitude=TARGET_LON;
 	gpsData->LatitudeRadianTarget=toRadians(TARGET_LAT);
 	gpsData->LongitudeRadianTarget=toRadians(TARGET_LON);
+	gpsData->LatitudeRadian=0; gpsData->LongitudeRadian=0;
 	//Default to low on pin at constructor
 	pinMode(GPS_ENABLE_PIN, OUTPUT);
 	if(!DBUG) {digitalWrite(GPS_ENABLE_PIN,LOW);}
@@ -81,9 +82,16 @@ void RR_GPS::getPosition(void)
 	if(lon=='W') gpsData->Longitude*=-1;
 	gpsData->Lat=lat;
 	gpsData->Lon=lon;
+	//Compute Distance Travelled
+	float latRad = toRadians(gpsData->Latitude);
+	float lonRad = toRadians(gpsData->Longitude);
+	if(gpsData->LatitudeRadian != 0 && gpsData->LongitudeRadian !=0){
+		gpsData->DistanceTravelled+=getDistance(gpsData->LatitudeRadian,latRad,gpsData->LongitudeRadian,lonRad);
+	}
+
 	//Convert to Radians and store accordingly.
-	gpsData->LatitudeRadian=toRadians(gpsData->Latitude);
-	gpsData->LongitudeRadian=toRadians(gpsData->Longitude);
+	gpsData->LatitudeRadian		=	latRad;
+	gpsData->LongitudeRadian	=	lonRad;
 
 }
 
@@ -120,7 +128,7 @@ void RR_GPS::getBearing(void)
 	float c = 2*atan2(sqrt(a),sqrt(1-a));
 	
 	gpsData->DistanceToTarget = R*c;
-	if(DBUG2){Serial.println(gpsData->DistanceToTarget);}
+	if(DBUG){Serial.println(gpsData->DistanceToTarget);}
 	// Using the formula for bearing to calculate the required current heading.
 	float y = sin(dlong)*cos(latTarget);
 	float x = cos(lat)*sin(latTarget)-sin(lat)*cos(latTarget)*cos(dlong);
@@ -146,4 +154,14 @@ float RR_GPS::toRadians(float coordinate)
 
 RR_GPS::~RR_GPS(void)
 {
+}
+
+uint16_t RR_GPS::getDistance(float lat0rad, float lon0rad, float lat1rad, float lon1rad){
+	
+	float dlat = lat1rad-lat0rad;
+	float dlong = lon1rad-lon0rad;
+
+	float a = sin(dlat/2)*sin(dlat/2)+sin(dlong/2)*sin(dlong/2)*cos(lat0rad)*cos(lat1rad);
+	float c = 2*atan2(sqrt(a),sqrt(1-a));
+	return (uint16_t)(a * c);
 }

@@ -28,7 +28,7 @@ private:
 	void getPosition(void);
 	void getBearing(void);
 	void getTimeDate(void);
-
+	uint16_t getDistance(float lat0rad, float lon0rad, float lat1rad, float lon1rad);
 	RR_GPSData_t *gpsData;
 
 };

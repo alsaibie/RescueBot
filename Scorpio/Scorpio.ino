@@ -271,7 +271,8 @@ static void vGPSTask(void *pvParameters){
 	// --- Task Options --- //
 	uint16_t SamplingTime= 1000L; //2 seconds - Rover is not that fast! Same for both taskOn and Idle.
 	bool taskOn=false;
-
+	uint32_t lastmillis = millis();
+	int16_t lastDistanceTravelled = 0;
 	// -------------------- //
 	uint16_t latTest=0;
 	while(1)
@@ -300,18 +301,32 @@ static void vGPSTask(void *pvParameters){
 			gps.newGPSData=false;
 			if(gps.fix){
 				gps.getData();
-				if(DBUG){Serial.println("Fix");
-				Serial.print("Dist 2 Tgt: ");
+				if(DBUG2){Serial.println("Fix");
+				Serial.print("Distance Travelled: "); Serial.println(GPSData.DistanceTravelled);
+				/*Serial.print("Dist 2 Tgt: ");
 				Serial.println(GPSData.DistanceToTarget);
 				Serial.print("Bearing: ");
-				Serial.println(GPSData.Bearing);
+				Serial.println(GPSData.Bearing);*/
 				}
 				xSemaphoreGive(GPSSemaphore);
 			}
 			else{
-				if(DBUG){Serial.println("NoFix");}
+				if(DBUG2){Serial.println("NoFix");}
 				xSemaphoreGive(GPSSemaphore);
-			}		
+			}
+
+			//Check if not moving
+			if(millis()-lastmillis>MOVING_SAMPLING_T){
+				if(GPSData.DistanceTravelled-lastDistanceTravelled<MOVING_DISTANCE_THRESHOLD){
+					GPSData.isMoving = 0;
+					if(DBUG2){Serial.println("Not Moving");}
+				}
+				else{
+					GPSData.isMoving = 1;
+				}
+				lastDistanceTravelled = GPSData.DistanceTravelled;
+				lastmillis=millis();
+			}
 			//Update Relevant Telemetry Data
 
 			if(xSemaphoreTake(TelemetryMutex, portMAX_DELAY)){
@@ -556,7 +571,7 @@ static void vDriverTask(void *pvParameters){
 						driver.Enable();
 						taskOn=true;		
 				}
-				SamplingTime=100L;
+				SamplingTime=20L;
 				//if(DBUG) {Serial.println("Driver Task");}
 				if(driveMode==MANUAL_3CH){
 					driver.driveManual(uint16_t(millis()-lastMillis));
@@ -647,7 +662,7 @@ static void vTelemetryTask(void *pvParameters){
 				break;
 			case NAVIGATING:
 				if(driveMode==MANUAL_PC){
-					SamplingTime=100L;			
+					SamplingTime=150L;			
 				}
 				else{
 					if(DBUG){

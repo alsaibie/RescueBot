@@ -57,8 +57,8 @@ void RR_Encoder::Update(void)
 
 void RR_Encoder::getSpeed(int16_t *mot1, int16_t *mot2)
 {
-	*mot1=speed1;
-	*mot2=speed2;
+	*mot1=speed2;
+	*mot2=speed1;
 }
 
 RR_Encoder::~RR_Encoder(void)

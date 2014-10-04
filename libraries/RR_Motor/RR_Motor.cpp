@@ -43,6 +43,8 @@ void RR_Motor::init()
   digitalWrite(_nD,HIGH); // default to on
   digitalWrite(_EN,HIGH); // default to on
   pinMode(_nSF,INPUT);
+  analogWriteFrequency(_M1PWM,20500);
+  analogWriteFrequency(_M2PWM,20500);
 }
 // Set speed for motor 1, speed is a number betwenn -400 and 400
 void RR_Motor::setM1Speed(int speed)
@@ -88,7 +90,7 @@ void RR_Motor::setM2Speed(int speed)
     reverse = 1;  // Preserve the direction
   }
 
-  analogWrite(_M2PWM,(speed * 51 / 80)+leftOffset); // default to using analogWrite, mapping 400 to 255
+  analogWrite(_M2PWM,(speed * 51 / 80)); // default to using analogWrite, mapping 400 to 255
   if (reverse)
     digitalWrite(_M2DIR,HIGH);
   else

@@ -48,7 +48,8 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 
 //GPS 
 #define GPS_ENABLE_PIN 2
-
+#define MOVING_SAMPLING_T 10000L //millisecs
+#define MOVING_DISTANCE_THRESHOLD 3 //Meters
 //SERIALS
 #define GPS_Serial Serial1
 

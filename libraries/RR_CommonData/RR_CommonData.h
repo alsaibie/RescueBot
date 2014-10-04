@@ -31,6 +31,7 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	int16_t	Bearing;
 	uint16_t Altitude, baseAltitude, maxAltitude;
 	uint32_t ellapsedm;
+	uint8_t	isMoving;
 
 }RR_TelemetryOutgoingMessage_t;
 
@@ -107,7 +108,7 @@ struct RR_GPSData_t
 	int16_t			Bearing;
 	uint16_t		DistanceToTarget, DistanceTravelled;
 	uint8_t			Speed;
-	//bool			isMoving;
+	uint8_t			isMoving;
 	struct Date_t
 	{
 		uint16_t Year;

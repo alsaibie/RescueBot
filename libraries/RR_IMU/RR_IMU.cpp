@@ -139,6 +139,7 @@ if(0)
 	}
 
 	imuData->fused.heading=-orientation.heading;
+	imuData->accelerometer.y=accelFil_event.acceleration.y;
 		//imuData->fused.heading=-headingnew;
 		if(0)
 	{

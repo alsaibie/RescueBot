@@ -9,7 +9,8 @@ Common Macros for hardware pins, constants, coordinates, communication rates.
 #include <Arduino.h>
 
 #define DBUG false
-#define DBUG2 true
+#define DBUG2 false
+#define DBUG3 true
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }

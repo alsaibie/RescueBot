@@ -181,24 +181,31 @@ int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRa
 		return speed;
 	}
 }
-void RR_Driver::driveManual(joystick_t data, uint16_t SamplingRate){
+void RR_Driver::driveManual(joystick_t data, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, uint16_t SamplingRate){
+
 	EffectiveSamplingRate=SamplingRate;
+	Situation_t Situation;
+	//Check Obstacle Situation
+	uint16_t rightCurrent	= motors.getM1CurrentMilliamps();
+	uint16_t leftCurrent	= motors.getM2CurrentMilliamps();
+	isObstacled(imudata, gpsdata.isMoving, leftCurrent, rightCurrent, leftActualSpeed, rightActualSpeed, Situation);
+
 	int nominalSpeed=map(-data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
 	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
 	int turnAngle=map(-data.Pad_Right.X_Axis,-32768, 32767,-180,180);
 	
 		if(turnAngle>20) //Turn Left
-	{
-		rightSpeed=nominalSpeed;
-		leftSpeed=(nominalSpeed*(1-(float)turnAngle/90));
-		if(0)
-			{
-				Serial.print(F("Mapped leftspeed:  "));
-				Serial.print(nominalSpeed); Serial.print(F("  "));
-				Serial.println(leftSpeed);
-			}
+		{
+			rightSpeed=nominalSpeed;
+			leftSpeed=(nominalSpeed*(1-(float)turnAngle/90));
+			if(0)
+				{
+					Serial.print(F("Mapped leftspeed:  "));
+					Serial.print(nominalSpeed); Serial.print(F("  "));
+					Serial.println(leftSpeed);
+				}
 
-	}
+		}
 	
 	else if(turnAngle<-20) //Turn Left
 	{
@@ -232,7 +239,10 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
 	//Check Obstacle Situation
-	isObstacled(imudata, Situation);
+	uint16_t rightCurrent	= motors.getM1CurrentMilliamps();
+	uint16_t leftCurrent	= motors.getM2CurrentMilliamps();
+
+	isObstacled(imudata, gpsdata.isMoving, leftCurrent, rightCurrent, leftActualSpeed, rightActualSpeed, Situation);
 
 	(Situation==CLEAR? NavigatingState=CRUISING : NavigatingState=OBSTACLED);
 	if(DBUG){
@@ -401,17 +411,51 @@ int16_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 	}
 	return dHeading;
 }
-
-void RR_Driver::isObstacled(RR_IMUData_t &imudata, Situation_t &Situation)
+void RR_Driver::isObstacled(RR_IMUData_t &imudata, bool isMoving, uint16_t left_current, uint16_t right_current, uint16_t left_speed, uint16_t right_speed, Situation_t &situation)
 {
+		//Situation = something, either CLEAR or 
+	if(DBUG3){
+		Serial.print("is Moving: "); Serial.println(isMoving);
+		Serial.print("leftCurrent: "); Serial.println(left_current);
+		Serial.print("rightCurrent: "); Serial.println(right_current);
+		Serial.print("actualleftRPM: "); Serial.println(left_speed);
+		Serial.print("actualrightRPM: "); Serial.println(right_speed);
+		Serial.print("Y Acc: "); Serial.println(imudata.accelerometer.y);
+	}
+	if(!isMoving){
+		if(imudata.accelerometer.y>8){
+			//tipped
+		}
+		else if(imudata.accelerometer.y<-8){
+			//tipped other side
+		}
+		else if(0){
+	
+		}
+		else if(0){
 
-	//Situation = something, either CLEAR or 
+		}
+		else if(0){
+
+		}
+	}
+
+	else {
+		situation = CLEAR;
+	}
+
+	if(DBUG2){
+		Serial.print("Situation: "); Serial.println(situation);
+	}
+
+
+
 }	
 void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 	#if !USE_RECEIVER
 	speedometer.Update();
 	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
-	if(DBUG2){
+	if(DBUG){
 	Serial.print("right speed: "); Serial.print(rightActualSpeed);
 	Serial.print(", d: "); Serial.println(rightSpeed);
 	Serial.print("left speed: "); Serial.print(leftActualSpeed);
@@ -435,7 +479,7 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 	
 	//leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
 	//rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
-		if(DBUG2){
+		if(DBUG){
 			
 	Serial.print("right PWM: "); Serial.println(rightPWMOld); 
 	Serial.print("left PWM: "); Serial.println(leftPWMOld);}

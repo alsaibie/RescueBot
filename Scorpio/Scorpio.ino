@@ -580,25 +580,37 @@ static void vDriverTask(void *pvParameters){
 				}
 
 				else if(driveMode==MANUAL_PC){
+					
+					if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
+						if(GPSData.fix){
+						//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));	
+							gpsDataNav.Bearing=GPSData.Bearing;
+							gpsDataNav.isMoving=GPSData.isMoving;
+							if(DBUG){Serial.println(gpsDataNav.Bearing);}
+						}
+					}
+					
+					if(xSemaphoreTake(IMUSemaphore, 50 / portTICK_RATE_MS)){
+						memcpy(&imuDataNav,&IMUData,sizeof(IMUData));
+					}
+					
 					xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
 					joystick_t joystick;
 					memcpy(&joystick,&TelemetryIncomingData.Joystick,sizeof(TelemetryIncomingData.Joystick));
 					int16_t actualSpeedLeft, actualSpeedRight;
-					driver.driveManual(joystick, uint16_t(millis()-lastMillis));
+					driver.driveManual(joystick, gpsDataNav, imuDataNav, uint16_t(millis()-lastMillis));
 					lastMillis=millis();
 					xSemaphoreGive(TelemetryMutex);
 				}
 				
 				else if(driveMode==AUTONOMOUS_SIMPLE){
 					
-					//Serial.println("Autonomous Nav");
 					if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
-							// TBUG TBUG TBUG
 							if(GPSData.fix){
 							//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));
 								
 								gpsDataNav.Bearing=GPSData.Bearing;
-								//gpsDataNav.Bearing=0;
+								gpsDataNav.isMoving=GPSData.isMoving;
 								if(DBUG){Serial.println(gpsDataNav.Bearing);}
 							}
 

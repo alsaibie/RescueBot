@@ -25,7 +25,7 @@ class RR_Driver
 public:
 	RR_Driver(RR_NavigationData_t *data);
 	void driveManual(void);
-	void driveManual(joystick_t data, uint16_t SamplingRate);
+	void driveManual(joystick_t data, RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, uint16_t SamplingRate);
 	void driveManual(uint16_t SamplingRate);
 	void setFree(void);
 	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRateE);
@@ -53,7 +53,8 @@ private:
 		STALL_STALL, STALL_FREE, STALL_RUN, 
 		FREE_STALL, FREE_FREE, FREE_RUN, 
 		RUN_STALL, RUN_FREE} Situation_t;
-	void isObstacled(RR_IMUData_t &imudata, Situation_t &situation);
+	void isObstacled(RR_IMUData_t &imudata, bool isMoving, uint16_t left_current, uint16_t right_current, uint16_t left_speed, uint16_t right_speed, Situation_t &situation);
+
 	//Navigation Tasks
 	int16_t getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata);		
 	

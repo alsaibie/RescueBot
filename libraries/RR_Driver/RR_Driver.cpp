@@ -414,7 +414,7 @@ int16_t RR_Driver::getdHeading(RR_IMUData_t &imudata, RR_GPSData_t &gpsdata)
 void RR_Driver::isObstacled(RR_IMUData_t &imudata, bool isMoving, uint16_t left_current, uint16_t right_current, uint16_t left_speed, uint16_t right_speed, Situation_t &situation)
 {
 		//Situation = something, either CLEAR or 
-	if(DBUG3){
+	if(DBUG2){
 		Serial.print("is Moving: "); Serial.println(isMoving);
 		Serial.print("leftCurrent: "); Serial.println(left_current);
 		Serial.print("rightCurrent: "); Serial.println(right_current);
@@ -455,7 +455,7 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 	#if !USE_RECEIVER
 	speedometer.Update();
 	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
-	if(DBUG){
+	if(DBUG3){
 	Serial.print("right speed: "); Serial.print(rightActualSpeed);
 	Serial.print(", d: "); Serial.println(rightSpeed);
 	Serial.print("left speed: "); Serial.print(leftActualSpeed);
@@ -464,30 +464,30 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 	error_left[2]=error_left[1];
 	error_left[1]=error_left[0];
 	error_left[0]=(leftSpeed - leftActualSpeed);
-
-	//leftPWM = leftPWMOld + Kp *(error_left[0]-error_left[1]) + Ki* error_left[0] + Kd * (error_left[0] - 2*error_left[1] + error_left[2]); //Feedback Error
-	//leftPWM = leftSpeed*Kt + .2 *error_left[0];
-	leftPWM = (leftSpeed*Kt*.93 + (Kp100 +Ki100 +Kd100) * error_left[0] + (-Kp100 -2*Kd100) *error_left[1] + Kd100 *error_left[2])/100; //Feedback Error
+	integral_left+=error_left[0];
+	//leftPWM = (leftSpeed*Kt*.93 + (Kp100 +Ki100 +Kd100) * error_left[0] + (-Kp100 -2*Kd100) *error_left[1] + Kd100 *error_left[2])/100; //Feedback Error
+	leftPWM = (Kp100  * error_left[1] + Ki100  * integral_left + Kd100 *(error_left[0]-error_left[1]))/100; //Feedback Error
 	leftPWMOld = accLimit(leftPWM,leftPWMOld,EffectiveSamplingRate);
 
 	error_right[2]=error_right[1];
 	error_right[1]=error_right[0];
 	error_right[0]=(rightSpeed - rightActualSpeed);
-	//rightPWM = rightSpeed + .5 * (rightSpeed - rightActualSpeed); //Feedback Error
-	rightPWM = (rightSpeed*Kt + (Kp100 +Ki100 +Kd100) * error_right[0] + (-Kp100 -2*Kd100) *error_right[1] + Kd100 *error_right[2])/100; //Feedback Error
+	integral_right+=error_right[0];
+	//rightPWM = (rightSpeed*Kt + (Kp100 +Ki100 +Kd100) * error_right[0] + (-Kp100 -2*Kd100) *error_right[1] + Kd100 *error_right[2])/100; //Feedback Error
+	rightPWM = (Kp100  * error_right[1] + Ki100  * integral_right + Kd100 *(error_right[0]-error_right[1]))/100; //Feedback Error
 	rightPWMOld = accLimit(rightPWM,rightPWMOld,EffectiveSamplingRate);
 	
 	//leftSpeedOld=accLimit(leftSpeed,leftSpeedOld, EffectiveSamplingRate);
 	//rightSpeedOld=accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate);
-		if(DBUG){
+		if(DBUG3){
 			
 	Serial.print("right PWM: "); Serial.println(rightPWMOld); 
 	Serial.print("left PWM: "); Serial.println(leftPWMOld);}
-	//motors.setSpeeds(rightPWMOld,leftPWMOld);
-		motors.setSpeeds(accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate),
-			accLimit(leftSpeed*.92,leftSpeedOld,EffectiveSamplingRate));
-		rightSpeedOld=rightSpeed;
-		leftSpeedOld=leftSpeed*.92;
+	motors.setSpeeds(rightPWMOld,leftPWMOld);
+		//motors.setSpeeds(accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate),
+		//	accLimit(leftSpeed*.92,leftSpeedOld,EffectiveSamplingRate));
+		//rightSpeedOld=rightSpeed;
+		//leftSpeedOld=leftSpeed*.92;
 		//motors.setSpeeds(rightPWMOld,0);
 	navigationdata->leftMotorSpeed=leftActualSpeed;
 	navigationdata->rightMotorSpeed=rightActualSpeed;

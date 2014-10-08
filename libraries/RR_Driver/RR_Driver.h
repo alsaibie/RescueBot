@@ -12,10 +12,10 @@
 #include "../RR_CommonData/RR_CommonData.h"
 #define ACCELERATION_LIMIT	800 //Points per second
 #define MAXSPEEDCHANGE		100
-#define Kp100	100  //20
-#define Ki100  200  //100
-#define Kd100  0  //10
-#define Kt		95  //95
+#define Kp100	30	//100  //20
+#define Ki100	30	//200  //100
+#define Kd100	30	//10
+#define Kt		80  //95
 typedef struct joystick_t : RR_TelemetryIncomingMessage_t::Joystick_t{
 
 };
@@ -41,6 +41,7 @@ private:
 	//Driving Routines
 	void setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed);
 	int16_t error_left[3], error_right[3];
+	int16_t integral_left, integral_right;
 	void cruiseModeSimple(int16_t bearing);
 	void cruiseModeAdvanced(int8_t bearing);
 	void tipoverMode(RR_IMUData_t &imudata); //When on the side and need to create imbalance 

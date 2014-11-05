@@ -32,6 +32,11 @@ typedef struct RR_TelemetryOutgoingMessage_t
 	uint16_t Altitude, baseAltitude, maxAltitude;
 	uint32_t ellapsedm;
 	uint8_t	isMoving;
+	    struct Motor_T
+    {
+		uint16_t leftCurrent, rightCurrent;
+		int16_t	leftSpeed, rightSpeed;
+    }Motors;
 
 }RR_TelemetryOutgoingMessage_t;
 

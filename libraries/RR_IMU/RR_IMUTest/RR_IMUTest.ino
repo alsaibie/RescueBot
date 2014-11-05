@@ -27,6 +27,7 @@ void setup(void)
   
   /* Initialise the IMU */
   imuS.initIMU();
+  	Serial.println("Test");
   delay(3000);
   /* Display some basic information on this IMU */
   imuS.DisplayIMUDetails();
@@ -35,6 +36,7 @@ void setup(void)
 
 void loop(void)
 {
+
   imuS.updateIMU();
   //scorpio.driveManual();
   delay(10);

@@ -31,6 +31,7 @@ public:
 	void driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR_LoggerData_t &loggerdata, uint16_t SamplingRateE);
 	void Enable(void);
 	void Stop(void);
+	void getMotorData(int16_t *leftspeed, int16_t *rightspeed, uint16_t *leftcurrent, uint16_t *rightcurrent);
 	NavigatingState_t NavigatingState;
 
 	~RR_Driver(void);
@@ -48,6 +49,7 @@ private:
 	void wigglingMode(Speed_t speedlevel = MEDIUM, uint8_t repeats = 1); //When Stuck and both wheels arent's moving much or both are free wheeling.
 	void reciprocatingMode(Speed_t speedleve = MEDIUM); //When not moving and one wheel is freewheeling.
 	int16_t accLimit(int16_t speed, int16_t speedOld, uint16_t SamplingRate);
+
 	//Situational Awareness Checks
 	//Situation Code TIPPED or WHEELS (LEFT_RIGHT:STALL, FREE or RUN(IN MOTION)) 
 	typedef enum {CLEAR=0, TIPPED, 
@@ -69,6 +71,7 @@ private:
 
 	RR_Motor motors;
 	int16_t leftSpeed, leftSpeedOld, rightSpeedOld, rightSpeed;
+	uint16_t leftCurrent, rightCurrent;
 	int16_t leftPWM, leftPWMOld, rightPWMOld, rightPWM;
 	uint16_t EffectiveSamplingRate; //Effective Sampling Rate
 	RR_NavigationData_t *navigationdata;

@@ -49,22 +49,22 @@ void RR_Motor::init()
 // Set speed for motor 1, speed is a number betwenn -400 and 400
 void RR_Motor::setM1Speed(int speed)
 {
-  speed=-speed; //Because the wires are flipped
+  //speed=-speed; //Because the wires are flipped
   unsigned char reverse = 0;
   
-  if (speed > 400)  // Max PWM dutycycle
-    speed = 400;
+  if (speed > MOTOR_MAX_SPEED)  // Max PWM dutycycle
+    speed = MOTOR_MAX_SPEED;
 	
-  if (speed < -400)  // Max PWM dutycycle
-    speed = -400;
+  if (speed < -MOTOR_MAX_SPEED)  // Max PWM dutycycle
+    speed = -MOTOR_MAX_SPEED;
   if (speed < 0)
   {
-    speed = 400+speed;  // Make speed a positive quantity
+    speed = MOTOR_MAX_SPEED+speed;  // Make speed a positive quantity
     reverse = 1;  // Preserve the direction
   }
 
     
-  analogWrite(_M1PWM,speed * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  analogWrite(_M1PWM,speed * 255 / MOTOR_MAX_SPEED); // default to using analogWrite, mapping 350 to 255
   if (reverse)
     digitalWrite(_M1DIR,HIGH);
   else
@@ -75,22 +75,22 @@ void RR_Motor::setM1Speed(int speed)
 void RR_Motor::setM2Speed(int speed)
 {
 	uint16_t leftOffset =0;
-	speed=-speed; //Because the wires are flipped
+	//speed=-speed; //Because the wires are flipped
   unsigned char reverse = 0;
     
-  if (speed > 400)  // Max PWM dutycycle
-    speed = 400;
+  if (speed > MOTOR_MAX_SPEED)  // Max PWM dutycycle
+    speed = MOTOR_MAX_SPEED;
 	
-  if (speed < -400)  // Max PWM dutycycle
-    speed = -400;
+  if (speed < -MOTOR_MAX_SPEED)  // Max PWM dutycycle
+    speed = -MOTOR_MAX_SPEED;
 
   if (speed < 0)
   {
-    speed = 400+speed;   // Make speed a positive quantity
+    speed = MOTOR_MAX_SPEED+speed;   // Make speed a positive quantity
     reverse = 1;  // Preserve the direction
   }
 
-  analogWrite(_M2PWM,(speed * 51 / 80)); // default to using analogWrite, mapping 400 to 255
+  analogWrite(_M2PWM,(speed * 255 / MOTOR_MAX_SPEED)); // default to using analogWrite, mapping 400 to 255
   if (reverse)
     digitalWrite(_M2DIR,HIGH);
   else

@@ -61,7 +61,7 @@ static void vGPSTask(void *pvParameters)
 		else
 		{
 			if(DBUG){
-				//Serial.println("NoFix");
+				Serial.println("NoFix");
 			}
 		}
 

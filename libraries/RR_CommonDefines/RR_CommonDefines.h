@@ -27,6 +27,7 @@ typedef enum {STANDBY, checkLAUNCH, checkPEAK, checkLANDING} AltimeterTask_t;
 #define TBUG Serial.println("Test");
 
 #define MOTOR_GEAR_RATIO 72
+#define MOTOR_MAX_SPEED 370
 #define ENCODER_COUNT 48
 #define WHEEL_RADIUS 0.07f
 //WINNING NUMBERS - MODIFY ACCORDINGLY

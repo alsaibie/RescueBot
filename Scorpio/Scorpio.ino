@@ -581,7 +581,7 @@ static void vDriverTask(void *pvParameters){
 
 				else if(driveMode==MANUAL_PC){
 					
-					if(xSemaphoreTake(GPSSemaphore, 50 / portTICK_RATE_MS)){
+					if(xSemaphoreTake(GPSSemaphore, 25 / portTICK_RATE_MS)){
 						if(GPSData.fix){
 						//memcpy(&gpsDataNav,&GPSData,sizeof(GPSData));	
 							gpsDataNav.Bearing=GPSData.Bearing;
@@ -590,16 +590,22 @@ static void vDriverTask(void *pvParameters){
 						}
 					}
 					
-					if(xSemaphoreTake(IMUSemaphore, 50 / portTICK_RATE_MS)){
+					if(xSemaphoreTake(IMUSemaphore, 25 / portTICK_RATE_MS)){
 						memcpy(&imuDataNav,&IMUData,sizeof(IMUData));
 					}
 					
-					xSemaphoreTake(TelemetryMutex, portMAX_DELAY);
+					xSemaphoreTake(TelemetryMutex, 25 / portTICK_RATE_MS);
 					joystick_t joystick;
 					memcpy(&joystick,&TelemetryIncomingData.Joystick,sizeof(TelemetryIncomingData.Joystick));
 					int16_t actualSpeedLeft, actualSpeedRight;
+					uint16_t leftCurrent, rightCurrent;
 					driver.driveManual(joystick, gpsDataNav, imuDataNav, uint16_t(millis()-lastMillis));
+					driver.getMotorData(&actualSpeedLeft,&actualSpeedRight,&leftCurrent,&rightCurrent);
 					lastMillis=millis();
+					TelemetryOutgoingData.Motors.leftCurrent=leftCurrent;
+					TelemetryOutgoingData.Motors.rightCurrent=rightCurrent;
+					TelemetryOutgoingData.Motors.leftSpeed=actualSpeedLeft;
+					TelemetryOutgoingData.Motors.rightSpeed=actualSpeedRight;
 					xSemaphoreGive(TelemetryMutex);
 				}
 				

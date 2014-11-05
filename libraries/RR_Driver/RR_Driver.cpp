@@ -169,15 +169,15 @@ int16_t RR_Driver::accLimit(int16_t speed, int16_t speedOld, uint16_t samplingRa
 	if((abs(speed-speedOld)*1000L)/samplingRate>ACCELERATION_LIMIT)
 	{
 		int16_t s = speedOld+(sgn(speed-speedOld)*ACCELERATION_LIMIT*samplingRate)/1000L;
-		if(s>400) s=400;
-		if(s<-400) s=-400;
+		if(s>MOTOR_MAX_SPEED) s=MOTOR_MAX_SPEED;
+		if(s<-MOTOR_MAX_SPEED) s=-MOTOR_MAX_SPEED;
 		return s;
 		//return speed;
 	}
 	else
 	{
-		if(speed>400) speed=400;
-		if(speed<-400) speed=-400;
+		if(speed>MOTOR_MAX_SPEED) speed=MOTOR_MAX_SPEED;
+		if(speed<-MOTOR_MAX_SPEED) speed=-MOTOR_MAX_SPEED;
 		return speed;
 	}
 }
@@ -186,12 +186,17 @@ void RR_Driver::driveManual(joystick_t data, RR_GPSData_t &gpsdata, RR_IMUData_t
 	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
 	//Check Obstacle Situation
-	uint16_t rightCurrent	= motors.getM1CurrentMilliamps();
-	uint16_t leftCurrent	= motors.getM2CurrentMilliamps();
+	rightCurrent	= motors.getM1CurrentMilliamps();
+	leftCurrent	= motors.getM2CurrentMilliamps();
 	isObstacled(imudata, gpsdata.isMoving, leftCurrent, rightCurrent, leftActualSpeed, rightActualSpeed, Situation);
 
-	int nominalSpeed=map(-data.Pad_Left.Y_Axis,-32768, 32767,-400,400);
-	if(nominalSpeed>-40 && nominalSpeed<40) nominalSpeed=0;
+	Serial.print("left Current:");
+	Serial.println(leftCurrent);
+	Serial.print("right Current:");
+	Serial.println(rightCurrent);
+	int nominalSpeed=map(-data.Pad_Left.Y_Axis,-32768, 32767,-100,100);
+	//int nominalSpeed = 50;
+	if(nominalSpeed>-5 && nominalSpeed<5) nominalSpeed=0;
 	int turnAngle=map(-data.Pad_Right.X_Axis,-32768, 32767,-180,180);
 	
 		if(turnAngle>20) //Turn Left
@@ -239,8 +244,8 @@ void RR_Driver::driveAutonomous(RR_GPSData_t &gpsdata, RR_IMUData_t &imudata, RR
 	EffectiveSamplingRate=SamplingRate;
 	Situation_t Situation;
 	//Check Obstacle Situation
-	uint16_t rightCurrent	= motors.getM1CurrentMilliamps();
-	uint16_t leftCurrent	= motors.getM2CurrentMilliamps();
+	rightCurrent	= motors.getM1CurrentMilliamps();
+	leftCurrent	= motors.getM2CurrentMilliamps();
 
 	isObstacled(imudata, gpsdata.isMoving, leftCurrent, rightCurrent, leftActualSpeed, rightActualSpeed, Situation);
 
@@ -457,13 +462,13 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 	speedometer.getSpeed(&rightActualSpeed,&leftActualSpeed);
 	if(DBUG3){
 	Serial.print("right speed: "); Serial.print(rightActualSpeed);
-	Serial.print(", d: "); Serial.println(rightSpeed);
+	Serial.print(", d: "); Serial.println(rightSpeed*MOTOR_MAX_SPEED/100);
 	Serial.print("left speed: "); Serial.print(leftActualSpeed);
-	Serial.print(", d: "); Serial.println(leftSpeed);}
+	Serial.print(", d: "); Serial.println(leftSpeed*MOTOR_MAX_SPEED/100);}
 	#endif
 	error_left[2]=error_left[1];
 	error_left[1]=error_left[0];
-	error_left[0]=(leftSpeed - leftActualSpeed);
+	error_left[0]=(leftSpeed*MOTOR_MAX_SPEED/100 - leftActualSpeed);
 	integral_left+=error_left[0];
 	//leftPWM = (leftSpeed*Kt*.93 + (Kp100 +Ki100 +Kd100) * error_left[0] + (-Kp100 -2*Kd100) *error_left[1] + Kd100 *error_left[2])/100; //Feedback Error
 	leftPWM = (Kp100  * error_left[1] + Ki100  * integral_left + Kd100 *(error_left[0]-error_left[1]))/100; //Feedback Error
@@ -471,7 +476,7 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 
 	error_right[2]=error_right[1];
 	error_right[1]=error_right[0];
-	error_right[0]=(rightSpeed - rightActualSpeed);
+	error_right[0]=((rightSpeed*MOTOR_MAX_SPEED)/100 - rightActualSpeed);
 	integral_right+=error_right[0];
 	//rightPWM = (rightSpeed*Kt + (Kp100 +Ki100 +Kd100) * error_right[0] + (-Kp100 -2*Kd100) *error_right[1] + Kd100 *error_right[2])/100; //Feedback Error
 	rightPWM = (Kp100  * error_right[1] + Ki100  * integral_right + Kd100 *(error_right[0]-error_right[1]))/100; //Feedback Error
@@ -483,15 +488,23 @@ void RR_Driver::setSpeedsFeedback(int16_t rightSpeed, int16_t leftSpeed){
 			
 	Serial.print("right PWM: "); Serial.println(rightPWMOld); 
 	Serial.print("left PWM: "); Serial.println(leftPWMOld);}
-	motors.setSpeeds(rightPWMOld,leftPWMOld);
-		//motors.setSpeeds(accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate),
-		//	accLimit(leftSpeed*.92,leftSpeedOld,EffectiveSamplingRate));
-		//rightSpeedOld=rightSpeed;
-		//leftSpeedOld=leftSpeed*.92;
-		//motors.setSpeeds(rightPWMOld,0);
+	//motors.setSpeeds(rightPWMOld,leftPWMOld);
+		motors.setSpeeds((rightSpeed*MOTOR_MAX_SPEED)/100,(leftSpeed*MOTOR_MAX_SPEED)/100);
+	//motors.setSpeeds(accLimit(rightSpeed,rightSpeedOld,EffectiveSamplingRate),
+	//	accLimit(leftSpeed*.92,leftSpeedOld,EffectiveSamplingRate));
+	//rightSpeedOld=rightSpeed;
+	//leftSpeedOld=leftSpeed*.92;
+	//motors.setSpeeds(rightPWMOld,0);
 	navigationdata->leftMotorSpeed=leftActualSpeed;
 	navigationdata->rightMotorSpeed=rightActualSpeed;
 }
+void RR_Driver::getMotorData(int16_t *leftspeed, int16_t *rightspeed, uint16_t *leftcurrent, uint16_t *rightcurrent){
+	*leftspeed=leftActualSpeed;
+	*rightspeed=rightActualSpeed;
+	*leftcurrent=leftCurrent;
+	*rightcurrent=rightCurrent;
+}
+
 RR_Driver::~RR_Driver(void)
 {
 }
